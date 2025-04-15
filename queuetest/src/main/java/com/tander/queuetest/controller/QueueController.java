@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
-import com.tander.queuetest.model.Notification;
+import com.tander.commons.model.Notification;
 import com.tander.queuetest.service.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;

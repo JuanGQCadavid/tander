@@ -37,6 +37,13 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- common -->
+		<dependency>
+			<groupId>com.tander</groupId>
+			<artifactId>commons</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 
 		<!-- <dependency>
 			<groupId>org.springframework.web.socket</groupId>

@@ -3,7 +3,7 @@ package com.tander.queuetest.service;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.tander.queuetest.model.Notification;
+import com.tander.commons.model.Notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

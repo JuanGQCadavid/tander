@@ -1,0 +1,4 @@
+com/tander/commons/model/payloads/EventNotification.class
+com/tander/commons/model/payloads/MatchNotification.class
+com/tander/commons/model/Notification.class
+com/tander/commons/App.class

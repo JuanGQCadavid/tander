@@ -3,7 +3,7 @@ package com.tander.notifications.service;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.tander.notifications.model.Notification;
+import com.tander.commons.model.Notification;
 
 import lombok.extern.slf4j.Slf4j;
 

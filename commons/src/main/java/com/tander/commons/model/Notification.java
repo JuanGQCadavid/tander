@@ -1,7 +1,7 @@
-package com.tander.notifications.model;
+package com.tander.commons.model;
 
-import com.tander.notifications.model.payloads.EventNotification;
-import com.tander.notifications.model.payloads.MatchNotification;
+import com.tander.commons.model.payloads.EventNotification;
+import com.tander.commons.model.payloads.MatchNotification;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

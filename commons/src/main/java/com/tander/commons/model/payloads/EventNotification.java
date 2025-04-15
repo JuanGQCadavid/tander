@@ -1,4 +1,4 @@
-package com.tander.queuetest.model.payloads;
+package com.tander.commons.model.payloads;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

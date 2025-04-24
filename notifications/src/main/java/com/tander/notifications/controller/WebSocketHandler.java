@@ -1,4 +1,4 @@
-package com.tander.notifications.service;
+package com.tander.notifications.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tander.notifications.configurations.WebSocketConfig;
 import com.tander.notifications.managers.SocketConnectionManager;
 import com.tander.notifications.model.WebsocketCommands;
 import com.tander.notifications.model.commands.AttachUserId;
@@ -35,6 +34,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
         this.actions = new HashMap<>() {};
 
         actions.put(WebsocketCommands.ATTACH_USER_ID, this::cmdUserAttach);
+    }
+
+    public boolean isUserConnected(String userId) {
+        Optional<WebSocketSession>  session = socketConnectionManager.getSessionByUserId(userId);
+
+        if(!session.isPresent()) {
+            return false;
+        }
+
+        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -71,6 +80,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         log.info("attachUserIds: " + attachUserId.get().getUserId());
         socketConnectionManager.attachSessionToUserId(session.getId(), attachUserId.get().getUserId());
+
+        try {
+            session.sendMessage(new TextMessage("OK"));
+        } catch (Exception e) {
+            log.error("We fail to reply back", e);
+        }
+        
     }
     
     /*
@@ -113,7 +129,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 this.actions.get(cmds).accept(session, message);
             }
         } 
-        session.sendMessage(new TextMessage("Echo: " + json));
 	}
 
     @Override

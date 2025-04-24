@@ -5,7 +5,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import com.tander.notifications.service.WebSocketHandler;
+import com.tander.notifications.controller.WebSocketHandler;
 
 import lombok.RequiredArgsConstructor;
 

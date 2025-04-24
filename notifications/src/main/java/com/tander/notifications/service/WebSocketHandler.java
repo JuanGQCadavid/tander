@@ -3,10 +3,9 @@ package com.tander.notifications.service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
@@ -15,9 +14,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tander.notifications.configurations.WebSocketConfig;
 import com.tander.notifications.managers.SocketConnectionManager;
 import com.tander.notifications.model.WebsocketCommands;
-import com.tander.notifications.model.WebsocketMessages;
 import com.tander.notifications.model.commands.AttachUserId;
 
 // import lombok.AllArgsConstructor;
@@ -28,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebSocketHandler extends TextWebSocketHandler {
     final SocketConnectionManager socketConnectionManager;
-    final Map<WebsocketCommands, Consumer<WebSocketSession>> actions;
+    final Map<WebsocketCommands, BiConsumer<WebSocketSession,TextMessage>> actions;
 
     WebSocketHandler(SocketConnectionManager socketConnectionManager){
         this.socketConnectionManager = socketConnectionManager;
@@ -38,8 +37,27 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
 
-    private void cmdUserAttach(WebSocketSession session) {
+    private void cmdUserAttach(WebSocketSession session,  TextMessage message) {
+        AttachUserId attachUserId = null;
 
+        try {
+            String json = message.getPayload();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode root = objectMapper.readTree(json);
+            attachUserId = (AttachUserId) objectMapper.treeToValue(
+                root.get("payload"), 
+                WebsocketCommands.ATTACH_USER_ID.getCommandClass()
+            );
+        } catch (Exception e) {
+            log.error("cmdUserAttach - Casting payload fail", e);
+        }
+
+        if (attachUserId == null) {
+            log.warn("cmdUserAttach - Casting not possible.");
+            return;
+        }
+
+        log.info("attachUserIds: " + attachUserId.getUserId());
     }
     
     /*
@@ -75,12 +93,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
         JsonNode root = objectMapper.readTree(json);
         String cmd = root.get("cmd").asText();
 
-        if(cmd.equals("AttachUserId")) {
-            String payload = root.get("payload").asText();
-            log.info("AttachUserId: " + payload);
-            AttachUserId attachUserId = objectMapper.treeToValue(root.get("payload"), AttachUserId.class);
-            log.info("user id: " + attachUserId.getUserId());
-        }
+
+        for (WebsocketCommands cmds: this.actions.keySet()){
+            if(cmds.getCmd().equals(cmd)) {
+                log.info("Command: ", cmds.getCmd());
+                this.actions.get(cmds).accept(session, message);
+            }
+        } 
+
+        // if(cmd.equals("AttachUserId")) {
+        //     String payload = root.get("payload").asText();
+        //     log.info("AttachUserId: " + payload);
+        //     AttachUserId attachUserId = objectMapper.treeToValue(root.get("payload"), AttachUserId.class);
+        //     log.info("user id: " + attachUserId.getUserId());
+        // }
  
         // WebsocketMessages websocketMessages = objectMapper.readValue(json, WebsocketMessages.class);
 

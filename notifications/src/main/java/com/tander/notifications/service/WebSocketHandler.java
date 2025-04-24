@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.apache.kafka.common.quota.ClientQuotaAlteration.Op;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -36,28 +37,40 @@ public class WebSocketHandler extends TextWebSocketHandler {
         actions.put(WebsocketCommands.ATTACH_USER_ID, this::cmdUserAttach);
     }
 
-
-    private void cmdUserAttach(WebSocketSession session,  TextMessage message) {
-        AttachUserId attachUserId = null;
+    @SuppressWarnings("unchecked")
+    private <T> Optional<T> castpayload(TextMessage message, WebsocketCommands commands) {
+        T payload = null;
 
         try {
             String json = message.getPayload();
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(json);
-            attachUserId = (AttachUserId) objectMapper.treeToValue(
+            payload = (T) objectMapper.treeToValue(
                 root.get("payload"), 
-                WebsocketCommands.ATTACH_USER_ID.getCommandClass()
+                commands.getCommandClass()
             );
         } catch (Exception e) {
-            log.error("cmdUserAttach - Casting payload fail", e);
+            log.error("castpayload - Casting payload fail", e);
         }
 
-        if (attachUserId == null) {
-            log.warn("cmdUserAttach - Casting not possible.");
+        if (payload == null) {
+            log.warn("castpayload - Casting not possible.");
+            return Optional.empty();
+        }
+
+        return Optional.of(payload);
+    }
+
+    private void cmdUserAttach(WebSocketSession session,  TextMessage message) {
+        Optional<AttachUserId> attachUserId = castpayload(message, WebsocketCommands.ATTACH_USER_ID);
+
+        if(!attachUserId.isPresent()){
+            log.info("attachUserIds is empy!");
             return;
         }
 
-        log.info("attachUserIds: " + attachUserId.getUserId());
+        log.info("attachUserIds: " + attachUserId.get().getUserId());
+        socketConnectionManager.attachSessionToUserId(session.getId(), attachUserId.get().getUserId());
     }
     
     /*
@@ -100,19 +113,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 this.actions.get(cmds).accept(session, message);
             }
         } 
-
-        // if(cmd.equals("AttachUserId")) {
-        //     String payload = root.get("payload").asText();
-        //     log.info("AttachUserId: " + payload);
-        //     AttachUserId attachUserId = objectMapper.treeToValue(root.get("payload"), AttachUserId.class);
-        //     log.info("user id: " + attachUserId.getUserId());
-        // }
- 
-        // WebsocketMessages websocketMessages = objectMapper.readValue(json, WebsocketMessages.class);
-
-        // System.out.println("Command: " + websocketMessages.getCmd());
-        // System.out.println("User ID from AttachUserId: " + websocketMessages.getAttachUserId().getUserId());
-
         session.sendMessage(new TextMessage("Echo: " + json));
 	}
 

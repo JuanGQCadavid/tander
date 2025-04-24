@@ -1,0 +1,12 @@
+
+{
+    "cmd": "AttachUserId",
+    
+    "AttachUserId": {
+        "UserId": "Holi"
+    },
+
+    "payload": {
+        "UserId": "Holi"
+    }
+}

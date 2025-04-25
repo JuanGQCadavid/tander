@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class UserApplication {
 
     public static void main(String[] args) {
+        DatabaseInitializer.initialize("userservice_db");
         SpringApplication.run(UserApplication.class, args);
     }
 

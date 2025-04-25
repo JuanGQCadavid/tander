@@ -16,5 +16,6 @@ public class UserDto {
     private Long id;
     private String email;
     private String phoneNumber;
-    // TODO: notification preference
+    private Boolean isVerified;
+    private NotificationPreferenceDto notificationPreference;
 }

@@ -42,6 +42,7 @@ public class UserService {
                 .id(userDto.getId())
                 .email(userDto.getEmail())
                 .phoneNumber(userDto.getPhoneNumber())
+                .isVerified(userDto.getIsVerified())
                 .build();
         userRepository.save(user);
         log.info("User {} is added to DB", user.getId());
@@ -71,6 +72,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
+                .isVerified(user.getIsVerified())
                 .build();
     }
 }

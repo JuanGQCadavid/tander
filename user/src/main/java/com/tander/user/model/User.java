@@ -14,14 +14,18 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
     private String phoneNumber;
-    // TODO: notification preference
     private String password;
+    private Boolean isVerified;
     private LocalDateTime createdAt;
+
+    @Embedded
+    private NotificationPreference notificationPreference;
 
     @PrePersist
     protected void onCreate() {

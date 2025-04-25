@@ -7,7 +7,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tander.user.dto.NotificationPreferenceDto;
 import com.tander.user.dto.UserDto;
+import com.tander.user.dto.UserRegistrationDto;
+import com.tander.user.model.NotificationPreference;
 import com.tander.user.model.User;
 import com.tander.user.repository.UserRepository;
 
@@ -32,17 +35,16 @@ public class UserService {
         return user.map(this::mapToUserDto);
     }
 
-    public void registerUser(UserDto userDto) {
-        if (userRepository.existsByEmail(userDto.getEmail())) {
+    public void registerUser(UserRegistrationDto registrationDtoDto) {
+        if (userRepository.existsByEmail(registrationDtoDto.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
 
-        // TODO: I think another DTO needs to be created to pass password
         User user = User.builder()
-                .id(userDto.getId())
-                .email(userDto.getEmail())
-                .phoneNumber(userDto.getPhoneNumber())
-                .isVerified(userDto.getIsVerified())
+                .email(registrationDtoDto.getEmail())
+                .password(registrationDtoDto.getPassword()) // TODO: hash
+                .phoneNumber(registrationDtoDto.getPhoneNumber())
+                .isVerified(false)
                 .build();
         userRepository.save(user);
         log.info("User {} is added to DB", user.getId());
@@ -65,6 +67,19 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
         log.info("User {} has been deleted", id);
+    }
+
+    public void updateNotificationPreferences(Long id, NotificationPreferenceDto notificationPreferenceDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        NotificationPreference notificationPreference = NotificationPreference.builder()
+                .allowEmail(notificationPreferenceDto.isAllowEmail())
+                .allowMessage(notificationPreferenceDto.isAllowMessage())
+                .allowPush(notificationPreferenceDto.isAllowPush())
+                .build();
+        user.setNotificationPreference(notificationPreference);
+        log.info("User {} notification preferences were updated", id);
     }
 
     private UserDto mapToUserDto(User user) {

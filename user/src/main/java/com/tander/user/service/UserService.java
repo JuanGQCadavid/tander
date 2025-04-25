@@ -72,7 +72,7 @@ public class UserService {
         log.info("User {} has been deleted", id);
     }
 
-    public UserDto loginUser(LoginDto loginDto) {
+    public UserDto login(LoginDto loginDto) {
         User user = userRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 

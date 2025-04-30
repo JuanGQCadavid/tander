@@ -18,12 +18,14 @@ public class NotificationDB {
 
     @Id
     private String id;
+    private String notificationCorrelation;
+    private String userId;
 
-    private String userNameA;
-    private String userIDA;
-    private String userNameB;
-    private String userIDB;
+    private String userMatchName; // Probably this will be deleted.
+    private String userMatchId;
+
     private String dateOfMatch;
+    private boolean checked;
 
     public NotificationDB(String id){
         this.id = id;

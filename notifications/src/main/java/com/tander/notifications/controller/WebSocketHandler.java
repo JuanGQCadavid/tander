@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.apache.kafka.common.quota.ClientQuotaAlteration.Op;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;

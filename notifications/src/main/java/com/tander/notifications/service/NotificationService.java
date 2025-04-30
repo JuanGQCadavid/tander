@@ -44,6 +44,7 @@ public class NotificationService {
         }
     }
 
+    // TWILO
     public void sendEmail(String userId, String message) {
         log.info("Email to " + userId + " with " +message);
 

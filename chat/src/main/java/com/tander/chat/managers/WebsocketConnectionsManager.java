@@ -3,7 +3,7 @@ package com.tander.chat.managers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -44,5 +44,14 @@ public class WebsocketConnectionsManager {
 
     public List<WebSocketSession> getSessionsFromChatId(String chatId){
         return this.state.get(chatId).values().stream().collect(Collectors.toList());
+    }
+
+    public Optional<String> getUserIdFromChatSession(String chatId, String sessionId){
+        for(String userId: this.state.get(chatId).keySet()){
+            if(this.state.get(chatId).get(userId).getId().equals(sessionId)){
+                return Optional.of(userId);
+            }
+        }
+        return Optional.empty();
     }
 }

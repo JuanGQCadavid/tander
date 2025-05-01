@@ -1,4 +1,4 @@
-package com.tander.profile.profile;
+package com.tander.profile;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

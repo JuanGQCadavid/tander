@@ -1,4 +1,4 @@
-package com.tander.profile.profile;
+package com.tander.profile;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

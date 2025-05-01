@@ -1,6 +1,5 @@
 package com.tander.chat;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import org.springframework.boot.CommandLineRunner;

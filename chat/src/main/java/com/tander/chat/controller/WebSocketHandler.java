@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tander.chat.model.WebsocketCommands;
 import com.tander.chat.model.cmd.AttachUserId;
+import com.tander.chat.model.cmd.Message;
 import com.tander.chat.service.ChatService;
 
 
@@ -31,6 +32,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         this.actions = new HashMap<WebsocketCommands, BiConsumer<WebSocketSession,TextMessage>>();
 
         this.actions.put(WebsocketCommands.ATTACH_USER_ID, this::cmdUserAttach);
+        this.actions.put(WebsocketCommands.NEW_MESSAGE, this::cmdNewMesssage);
     }
 
     @SuppressWarnings("unchecked")
@@ -67,6 +69,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
 
         chatService.attachUsertoChat(payload.get(), session);        
+    }
+
+
+    private void cmdNewMesssage(WebSocketSession session, TextMessage message) {
+        Optional<Message> payload = castpayload(message, WebsocketCommands.NEW_MESSAGE);
+
+        if(!payload.isPresent()){
+            log.info("New Message is empy!");
+            this.sendMessageBack(session, "payload needs to have textContent");
+            return;
+        }
+
+        this.chatService.newMessage(payload.get(), session);
     }
 
     private void sendMessageBack(WebSocketSession session, String message){

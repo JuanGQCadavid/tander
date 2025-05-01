@@ -62,20 +62,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         if(!payload.isPresent()){
             log.info("AttachUserId is empy!");
-            try {
-                session.sendMessage(new TextMessage("payload needs to have userId and chatId"));
-            } catch (Exception e) {
-                log.error("We fail to reply back", e);
-            }
+            this.sendMessageBack(session, "payload needs to have userId and chatId");
             return;
         }
 
-        chatService.attachUsertoChat(payload.get(), session);
+        chatService.attachUsertoChat(payload.get(), session);        
+    }
 
+    private void sendMessageBack(WebSocketSession session, String message){
         try {
-            session.sendMessage(new TextMessage("OK"));
+            session.sendMessage(new TextMessage(message));
         } catch (Exception e) {
-            log.error("We fail to reply back", e);
+            log.error("We fail to reply back to session id " + session.getId(), e);
         }
         
     }

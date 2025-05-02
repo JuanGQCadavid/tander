@@ -3,6 +3,7 @@ package com.tander.profile.model;
 import java.util.List;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Preferences {
 
-    private Gender gender;
+    private Gender genderPreference;
     private List<String> interests;
-    private Location location;
+
+    @Embedded
+    private Location locationPreference;
     private int maxDistance;
     private int minAge;
     private int maxAge;

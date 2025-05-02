@@ -68,9 +68,9 @@ public class ProfileService {
     public ProfileDTO updatePreferences(Long userId, PreferencesDTO preferencesDTO) {
         Profile profile = getProfile(userId);
 
-        profile.getPreferences().setGender(preferencesDTO.getGender());
+        profile.getPreferences().setGenderPreference(preferencesDTO.getGender());
         profile.getPreferences().setInterests(preferencesDTO.getInterests());
-        profile.getPreferences().setLocation(preferencesDTO.getLocation());
+        profile.getPreferences().setLocationPreference(preferencesDTO.getLocation());
         profile.getPreferences().setMaxDistance(preferencesDTO.getMaxDistance());
         profile.getPreferences().setMinAge(preferencesDTO.getMinAge());
         profile.getPreferences().setMaxAge(preferencesDTO.getMaxAge());

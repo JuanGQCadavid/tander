@@ -20,8 +20,18 @@ public class Profile {
     private String name;
     // TODO: image
     private LocalDateTime dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    @Embedded
     private Preferences preferences;
+
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "profile_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "profile_longitude"))
+    })
+    @Embedded
     private Location location;
     private String bio;
 }

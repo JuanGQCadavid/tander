@@ -29,15 +29,15 @@ public interface ProfileRepository extends CrudRepository<Profile, Long> {
                 sin(radians(:latitude)) *
                 sin(radians(p.location.latitude))
             )) < :distance
-            """)
+            """, nativeQuery = true)
     List<Profile> findProfilesWithinDistance(
             @Param("latitude") double latitude,
             @Param("longitude") double longitude,
             @Param("distance") double distanceInKm);
 
-    @Query("SELECT p FROM Profile p " +
+    @Query(value = "SELECT p FROM Profile p " +
             "WHERE p.gender = :preferredGender " +
-            "AND FUNCTION('YEAR', CURRENT_DATE) - FUNCTION('YEAR', p.dateOfBirth) BETWEEN :minAge AND :maxAge")
+            "AND FUNCTION('YEAR', CURRENT_DATE) - FUNCTION('YEAR', p.dateOfBirth) BETWEEN :minAge AND :maxAge", nativeQuery = true)
     List<Profile> findProfilesByPreferences(
             @Param("preferredGender") Gender preferredGender,
             @Param("minAge") Integer minAge,

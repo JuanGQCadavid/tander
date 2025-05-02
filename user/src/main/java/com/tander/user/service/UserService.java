@@ -11,6 +11,9 @@ import com.tander.user.dto.LoginDto;
 import com.tander.user.dto.NotificationPreferenceDto;
 import com.tander.user.dto.UserDto;
 import com.tander.user.dto.UserRegistrationDto;
+import com.tander.user.exception.AuthException;
+import com.tander.user.exception.ResourceAlreadyExistsException;
+import com.tander.user.exception.UserNotFoundException;
 import com.tander.user.model.NotificationPreference;
 import com.tander.user.model.User;
 import com.tander.user.repository.UserRepository;
@@ -20,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class UserService {
-    // TODO: reasonable exception types
 
     @Autowired
     private UserRepository userRepository;
@@ -38,7 +40,7 @@ public class UserService {
 
     public UserDto registerUser(UserRegistrationDto registrationDtoDto) {
         if (userRepository.existsByEmail(registrationDtoDto.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new ResourceAlreadyExistsException("Email already registered");
         }
 
         User user = User.builder()
@@ -54,10 +56,10 @@ public class UserService {
 
     public UserDto updateUser(Long id, UserDto userDto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new ResourceAlreadyExistsException("Email already registered");
         }
 
         user.setEmail(userDto.getEmail());
@@ -74,11 +76,11 @@ public class UserService {
 
     public UserDto login(LoginDto loginDto) {
         User user = userRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+                .orElseThrow(() -> new AuthException("Invalid username or password"));
 
         // TODO: resolve hash
         if (user.getPassword() != loginDto.getPassword()) {
-            throw new RuntimeException("Invalid username or password");
+            throw new AuthException("Invalid username or password");
         }
 
         return mapToUserDto(user);
@@ -86,7 +88,7 @@ public class UserService {
 
     public void updateNotificationPreferences(Long id, NotificationPreferenceDto notificationPreferenceDto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
         NotificationPreference notificationPreference = NotificationPreference.builder()
                 .allowEmail(notificationPreferenceDto.isAllowEmail())

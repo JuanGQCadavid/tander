@@ -18,8 +18,6 @@ public class ChatApplication {
 		SpringApplication.run(ChatApplication.class, args);
 	}
 
-	// https://open.spotify.com/track/7xFy1kfgGWJWTpx1vSHBLi?si=579d57cdebd94581
-
     @Bean
     public CommandLineRunner loadData(ChatUserRepository chatUserRepository) {
       	return args -> {

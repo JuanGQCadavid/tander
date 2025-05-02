@@ -17,9 +17,9 @@ public class LocationDTO {
     @Min(value = -90, message = "Latitude must be greater than -90")
     @Max(value = 90, message = "Latitude must be less than 90")
     @NotNull(message = "Latitude is required")
-    private Long latitude;
+    private Double latitude;
 
     @Min(value = -180, message = "Longitude must be greater than -180")
     @Max(value = 180, message = "Longitude must be less than 180")
-    private Long longitude;
+    private Double longitude;
 }

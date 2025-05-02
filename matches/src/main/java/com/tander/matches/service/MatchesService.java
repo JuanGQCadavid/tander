@@ -56,8 +56,13 @@ public class MatchesService {
         return matches.stream().map(this::mapToMatchDto).toList();
     }
 
-    public List<MatchDTO> getUserMatches(Long userId) {
-        List<Match> matches = new ArrayList<>(matchesRepository.findUserMatches(userId));
+    public List<MatchDTO> getUserMatches(Long profileId) {
+        List<Match> matches = new ArrayList<>(matchesRepository.findUserMatches(profileId));
+        return matches.stream().map(this::mapToMatchDto).toList();
+    }
+
+    public List<MatchDTO> getUnansweredMatches(Long profileId) {
+        List<Match> matches = new ArrayList<>(matchesRepository.findUnansweredMatches(profileId));
         return matches.stream().map(this::mapToMatchDto).toList();
     }
 

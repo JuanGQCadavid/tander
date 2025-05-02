@@ -8,12 +8,13 @@ import com.tander.profile.model.Gender;
 import com.tander.profile.model.Profile;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProfileRepository extends CrudRepository<Profile, Long> {
 
     List<Profile> findByGender(Gender gender);
 
-    List<Profile> findByName(String name);
+    Optional<Profile> findByName(String name);
 
     @Query("SELECT p FROM Profile p JOIN p.preferences.interests i WHERE i IN :interests")
     List<Profile> findByInterests(@Param("interests") List<String> interests);

@@ -36,6 +36,12 @@ public class ProfileService {
         return mapToProfileDto(profile);
     }
 
+    public ProfileDTO getProfileByName(String name) {
+        Profile profile = profileRepository.findByName(name)
+                .orElseThrow(() -> new ProfileNotFoundException("Profile not found with name " + name));
+        return mapToProfileDto(profile);
+    }
+
     public ProfileDTO createProfile(ProfileDTO profileDTO) {
         Profile profile = Profile.builder()
                 .userId(profileDTO.getUserId())

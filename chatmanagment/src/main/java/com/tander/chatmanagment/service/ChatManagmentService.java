@@ -3,10 +3,12 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.tander.chatmanagment.dto.ChatDTO;
 import com.tander.chatmanagment.dto.MessagesDTO;
 import com.tander.chatmanagment.model.Chat;
 import com.tander.chatmanagment.model.ChatUser;
@@ -28,8 +30,23 @@ public class ChatManagmentService {
     private final MessagesRepository messagesRepository; 
 
     public List<MessagesDTO> getMessagesFromId(String lastMessageId, String chatId){
-        return null;
+        return messagesRepository.findMessagesAfterMessageId(chatId, lastMessageId)
+                .stream()
+                .map(chat -> MessagesDTO.fromMessages(chat))
+                .collect(Collectors.toList());
     }
+
+    public List<ChatDTO> getChats(String userId) {
+        log.info(userId);
+        return chatUserRepository.findByUserId(userId)
+            .stream()
+            .map(cu -> chatRepository.findById(cu.getId().getChatid()))
+            .filter(chOptional -> chOptional.isPresent())
+            .map(chOptional -> chOptional.get())
+            .map(chat -> ChatDTO.fromChat(chat))
+            .collect(Collectors.toList());
+    }
+
 
     public List<MessagesDTO> getMessages(String chatId){
         return messagesRepository.findByChatId(chatId)

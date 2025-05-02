@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tander.chatmanagment.service.ChatManagmentService;
+import com.tander.chatmanagment.dto.ChatDTO;
 import com.tander.chatmanagment.dto.MessagesDTO;
 import com.tander.chatmanagment.exceptions.MatchException;
 
@@ -43,5 +44,11 @@ public class RESTController {
 
             return service.getMessagesFromId(fromId, chatId);
     }
+
+    @GetMapping("/")
+    public List<ChatDTO> getChats(@RequestHeader String userId) {
+        return service.getChats(userId);
+    }
+    
     
 }

@@ -1,4 +1,6 @@
-package com.tander.profile.model;
+package com.tander.chatmanagment.model;
+
+import java.io.Serializable;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -7,12 +9,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Embeddable
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Location {
-
-    private Double latitude;
-    private Double longitude;
+public class ChatUserKey implements Serializable{
+    private String userId;
+    private String chatid;
+    
 }

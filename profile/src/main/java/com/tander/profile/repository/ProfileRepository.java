@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.tander.profile.model.Gender;
 import com.tander.profile.model.Profile;
+
 import java.util.List;
 
 public interface ProfileRepository extends CrudRepository<Profile, Long> {
@@ -32,5 +33,13 @@ public interface ProfileRepository extends CrudRepository<Profile, Long> {
             @Param("latitude") double latitude,
             @Param("longitude") double longitude,
             @Param("distance") double distanceInKm);
+
+    @Query("SELECT p FROM Profile p " +
+            "WHERE p.gender = :preferredGender " +
+            "AND FUNCTION('YEAR', CURRENT_DATE) - FUNCTION('YEAR', p.dateOfBirth) BETWEEN :minAge AND :maxAge")
+    List<Profile> findProfilesByPreferences(
+            @Param("preferredGender") Gender preferredGender,
+            @Param("minAge") Integer minAge,
+            @Param("maxAge") Integer maxAge);
 
 }

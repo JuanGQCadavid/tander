@@ -18,6 +18,7 @@ public class NotificationService {
     public void sendNotificationMessage(Notification notification){
         log.info("Send Notification: {} ", notification.toString());
         kafki.send("notification", notification);
+        kafki.send("chat", notification);
     }
     
 }

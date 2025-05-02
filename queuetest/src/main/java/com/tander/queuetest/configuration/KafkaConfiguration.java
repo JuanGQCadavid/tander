@@ -14,5 +14,13 @@ public class KafkaConfiguration {
             .partitions(1)
             .build();
     }
+
+    @Bean
+    public NewTopic chatTopic(){
+        return TopicBuilder
+            .name("chat")
+            .partitions(1)
+            .build();
+    }
     
 }

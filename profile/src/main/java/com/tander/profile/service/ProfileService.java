@@ -2,6 +2,7 @@ package com.tander.profile.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import com.tander.profile.dto.LocationDTO;
 import com.tander.profile.dto.PreferencesDTO;
 import com.tander.profile.dto.ProfileDTO;
 import com.tander.profile.exception.ProfileNotFoundException;
+import com.tander.profile.model.Gender;
 import com.tander.profile.model.Location;
 import com.tander.profile.model.Profile;
 import com.tander.profile.repository.ProfileRepository;
@@ -31,6 +33,12 @@ public class ProfileService {
 
     public ProfileDTO getProfileByUserId(Long userId) {
         Profile profile = getProfile(userId);
+        return mapToProfileDto(profile);
+    }
+
+    public ProfileDTO getProfileByName(String name) {
+        Profile profile = profileRepository.findByName(name)
+                .orElseThrow(() -> new ProfileNotFoundException("Profile not found with name " + name));
         return mapToProfileDto(profile);
     }
 
@@ -98,7 +106,29 @@ public class ProfileService {
         log.info("Profile {} has been deleted", userId);
     }
 
-    // TODO: getters based on attributes?
+    public List<ProfileDTO> findProfilesByGender(Gender gender) {
+        return profileRepository.findByGender(gender).stream()
+                .map(this::mapToProfileDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProfileDTO> findProfilesWithinDistance(Double latitude, Double longitude, Integer distance) {
+        return profileRepository.findProfilesWithinDistance(latitude, longitude, distance).stream()
+                .map(this::mapToProfileDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProfileDTO> findProfilesByPreferences(Gender gender, Integer minAge, Integer maxAge) {
+        return profileRepository.findProfilesByPreferences(gender, minAge, maxAge).stream()
+                .map(this::mapToProfileDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProfileDTO> findProfilesByInterests(List<String> interests) {
+        return profileRepository.findByInterests(interests).stream()
+                .map(this::mapToProfileDto)
+                .collect(Collectors.toList());
+    }
 
     private Profile getProfile(Long userId) {
         return profileRepository.findById(userId)

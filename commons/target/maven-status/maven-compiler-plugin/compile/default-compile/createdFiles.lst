@@ -1,3 +1,4 @@
+com/tander/commons/model/payloads/VerificationCode.class
 com/tander/commons/model/payloads/EventNotification.class
 com/tander/commons/model/payloads/MatchNotification.class
 com/tander/commons/model/Notification.class

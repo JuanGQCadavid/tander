@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tander.commons.model.payloads.MatchNotification;
+import com.tander.commons.model.payloads.VerificationCode;
 import com.tander.notifications.controller.WebSocketHandler;
 
 
@@ -28,6 +29,10 @@ public class NotificationService {
 
     @Autowired
     private final SnsClient snsClient;
+
+    public void notifyVerification(VerificationCode nCode) {
+        sendMSM(String.valueOf(nCode.getUserId()), "Your Tander verification code is: " + nCode.getCode());
+    }
 
     public void notifyMatch(MatchNotification matchNotification) {
         List<String> users = new ArrayList<String>();

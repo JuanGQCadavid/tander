@@ -2,6 +2,7 @@ package com.tander.commons.model;
 
 import com.tander.commons.model.payloads.EventNotification;
 import com.tander.commons.model.payloads.MatchNotification;
+import com.tander.commons.model.payloads.VerificationCode;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +20,8 @@ public class Notification {
 
     // Side project
     private EventNotification eventNotificationPayload;
+
+    //Verifying
+    private VerificationCode verificationCode;
+
 }

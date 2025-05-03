@@ -27,7 +27,11 @@ public class ConsumerService {
         }else if(notification.getMatchNotification() != null ){
             log.info("Match notification" + notification.getMatchNotification());
             notificationService.notifyMatch(notification.getMatchNotification()); // TODO if this fail, then we should return the notification to the queue
-        } else {
+        }else if(notification.getVerificationCode() != null){
+            log.info("Verification notification" + notification.getVerificationCode());
+            notificationService.notifyVerification(notification.getVerificationCode());
+        }
+        else {
             log.info("Hmmmm no idea what arrived");
         }
         try{

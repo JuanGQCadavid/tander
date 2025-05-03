@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tander.user.dto.LoginDto;
 import com.tander.user.dto.NotificationPreferenceDto;
+import com.tander.user.dto.TestDTO;
 import com.tander.user.dto.UserDto;
 import com.tander.user.dto.UserRegistrationDto;
 import com.tander.user.service.UserService;
@@ -54,6 +55,11 @@ public class UserController {
     @PostMapping("/login")
     public UserDto login(@RequestBody LoginDto loginDto) {
         return userService.login(loginDto);
+    }
+
+    @PostMapping("/test")
+    public void test(@RequestBody TestDTO userDto) {
+        userService.jutsTest(userDto);
     }
 
     @PutMapping("/{id}/notifications")

@@ -1,4 +1,4 @@
-package com.example.usermanagement.exception;
+package com.tander.user.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

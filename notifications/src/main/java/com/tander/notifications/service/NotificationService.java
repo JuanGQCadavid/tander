@@ -58,9 +58,13 @@ public class NotificationService {
 
         // TODO -- Call to users backend
         Map<String, String> userPhones = new HashMap<String,String>() {};
-        userPhones.put("andre", "+37256503971");
-        userPhones.put("kristofer", "+3725022180");
-        userPhones.put("juan", "+37253956581");
+        // userPhones.put("andre", "+37256503971");
+        // userPhones.put("kristofer", "+3725022180");
+        // userPhones.put("juan", "+37253956581");
+
+        userPhones.put("1", "+37256503971");
+        userPhones.put("2", "+3725022180");
+        userPhones.put("3", "+37253956581");
 
 
         if (userPhones.getOrDefault(userId, "Nope").equals("Nope")){

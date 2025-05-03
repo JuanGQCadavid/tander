@@ -25,7 +25,7 @@ public class MatchesController {
         return matchesService.getUserMatches(id);
     }
 
-    @PostMapping("/profile/{id}/unAnswered")
+    @GetMapping("/profile/{id}/unAnswered")
     public List<MatchDTO> getUnansweredMatches(@PathVariable Long id) {
         return matchesService.getUnansweredMatches(id);
     }

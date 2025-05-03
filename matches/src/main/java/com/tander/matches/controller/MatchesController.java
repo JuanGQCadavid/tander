@@ -25,6 +25,11 @@ public class MatchesController {
         return matchesService.getUserMatches(id);
     }
 
+    @GetMapping("/profile/{id}/unAnswered")
+    public List<MatchDTO> getUnansweredMatches(@PathVariable Long id) {
+        return matchesService.getUnansweredMatches(id);
+    }
+
     @GetMapping("/getMatch")
     public Optional<MatchDTO> getMatchByUserIds(@RequestParam long profileId1, @RequestParam long profileId2) {
         return matchesService.getMatchByUserIds(profileId1, profileId2);

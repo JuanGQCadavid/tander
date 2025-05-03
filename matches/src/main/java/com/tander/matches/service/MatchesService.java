@@ -1,23 +1,31 @@
 package com.tander.matches.service;
 
+import com.tander.commons.model.Notification;
+import com.tander.commons.model.payloads.MatchNotification;
 import com.tander.matches.dto.CreateMatchDTO;
 import com.tander.matches.dto.MatchDTO;
 import com.tander.matches.model.Match;
 import com.tander.matches.model.Status;
 import com.tander.matches.repository.MatchesRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 @Slf4j
 public class MatchesService {
     @Autowired
     private MatchesRepository matchesRepository;
+    private final KafkaTemplate<String, Notification> kafki;
+
 
     public MatchDTO createMatch(CreateMatchDTO matchDTO) {
         Match match = Match.builder()
@@ -38,6 +46,18 @@ public class MatchesService {
             match.setProfileStatus1(matchDTO.getProfileStatus1());
             match.setProfileStatus2(matchDTO.getProfileStatus2());
             matchesRepository.save(match);
+            if (matchDTO.getProfileStatus1().equals(Status.LIKE) && matchDTO.getProfileStatus2().equals(Status.LIKE)) {
+                Notification notification = new Notification();
+                MatchNotification matchNotification = new MatchNotification();
+                matchNotification.setDateOfMatch(String.valueOf(OffsetDateTime.now()));
+                matchNotification.setUserIDA(String.valueOf(matchDTO.getProfileId1()));
+                matchNotification.setUserIDB(String.valueOf(matchDTO.getProfileId2()));
+                matchNotification.setUserNameA("");
+                matchNotification.setUserNameB("");
+                notification.setMatchNotification(matchNotification);
+                kafki.send("notification", notification);
+                kafki.send("chat", notification);
+            }
             log.info("Match {} updated", match.getMatchId());
             return mapToMatchDto(match);
         } else {

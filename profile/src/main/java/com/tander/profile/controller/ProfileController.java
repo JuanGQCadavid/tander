@@ -79,7 +79,7 @@ public class ProfileController {
 
     @GetMapping("/search/preferences")
     public ResponseEntity<List<ProfileDTO>> findProfilesByPreferences(
-            @RequestParam Gender gender,
+            @RequestParam(required = false) Gender gender,
             @RequestParam Integer minAge,
             @RequestParam Integer maxAge) {
         return ResponseEntity.ok(profileService.findProfilesByPreferences(gender, minAge, maxAge));

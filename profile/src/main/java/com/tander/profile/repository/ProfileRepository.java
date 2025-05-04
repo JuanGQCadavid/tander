@@ -24,7 +24,7 @@ public interface ProfileRepository extends CrudRepository<Profile, Long> {
 
     @Query(value = """
             SELECT * FROM profiletable p
-            WHERE p.gender = :preferredGender
+            WHERE (:preferredGender IS NULL OR p.gender = :preferredGender)
             AND EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.date_of_birth)) BETWEEN :minAge AND :maxAge
             """, nativeQuery = true)
     List<Profile> findProfilesByPreferences(

@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NotipersistanceApplication {
 
 	public static void main(String[] args) {
+		DatabaseInitializer.initialize("notifications_service");
 		SpringApplication.run(NotipersistanceApplication.class, args);
 	}
 

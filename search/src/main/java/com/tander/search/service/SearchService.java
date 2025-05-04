@@ -41,6 +41,8 @@ public class SearchService {
             Preferences userPreferences = userProfile.getPreferences();
             List<ProfileDTO> profilesBasedOnPreferences = searchByPreferences(userPreferences);
             List<ProfileDTO> unAnsweredProfiles = getUnAnsweredMatches(userId);
+            // TODO: filter duplicates.
+            // TODO: filter yourself
             List<ProfileDTO> results = new ArrayList<>(unAnsweredProfiles);
             results.addAll(profilesBasedOnPreferences);
             return results;

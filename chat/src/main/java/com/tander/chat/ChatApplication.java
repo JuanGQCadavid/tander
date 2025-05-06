@@ -15,6 +15,7 @@ import com.tander.chat.repository.ChatUserRepository;
 public class ChatApplication {
 
 	public static void main(String[] args) {
+		DatabaseInitializer.initialize("chat_service");
 		SpringApplication.run(ChatApplication.class, args);
 	}
 

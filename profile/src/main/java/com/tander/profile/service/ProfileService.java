@@ -119,13 +119,13 @@ public class ProfileService {
     }
 
     public List<ProfileDTO> findProfilesByPreferences(Gender gender, Integer minAge, Integer maxAge) {
-        return profileRepository.findProfilesByPreferences(gender, minAge, maxAge).stream()
+        return profileRepository.findProfilesByPreferences(gender != null ? gender.name() : null, minAge, maxAge).stream()
                 .map(this::mapToProfileDto)
                 .collect(Collectors.toList());
     }
 
     public List<ProfileDTO> findProfilesByInterests(List<String> interests) {
-        return profileRepository.findByInterests(interests).stream()
+        return profileRepository.findByInterests(interests.toArray(new String[0])).stream()
                 .map(this::mapToProfileDto)
                 .collect(Collectors.toList());
     }

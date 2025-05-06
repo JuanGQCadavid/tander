@@ -16,31 +16,36 @@ public interface ProfileRepository extends CrudRepository<Profile, Long> {
 
     Optional<Profile> findByName(String name);
 
-    @Query("SELECT p FROM Profile p JOIN p.preferences.interests i WHERE i IN :interests")
-    List<Profile> findByInterests(@Param("interests") List<String> interests);
+    @Query(value = """
+        SELECT * FROM profiletable p
+        WHERE p.interests && :preferredInterests
+        """, nativeQuery = true)
+    List<Profile> findByInterests(@Param("preferredInterests") String[] preferredInterests);
 
     @Query(value = """
-            SELECT p FROM Profile p
+            SELECT * FROM profiletable p
+            WHERE (:preferredGender IS NULL OR p.gender = :preferredGender)
+            AND EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.date_of_birth)) BETWEEN :minAge AND :maxAge
+            """, nativeQuery = true)
+    List<Profile> findProfilesByPreferences(
+            @Param("preferredGender") String preferredGender,
+            @Param("minAge") Integer minAge,
+            @Param("maxAge") Integer maxAge);
+
+    @Query(value = """
+            SELECT * FROM profiletable p
             WHERE
             (6371 * acos(
                 cos(radians(:latitude)) *
-                cos(radians(p.location.latitude)) *
-                cos(radians(p.location.longitude) - radians(:longitude)) +
+                cos(radians(p.profile_latitude)) *
+                cos(radians(p.profile_longitude) - radians(:longitude)) +
                 sin(radians(:latitude)) *
-                sin(radians(p.location.latitude))
+                sin(radians(p.profile_latitude))
             )) < :distance
             """, nativeQuery = true)
     List<Profile> findProfilesWithinDistance(
             @Param("latitude") double latitude,
             @Param("longitude") double longitude,
             @Param("distance") double distanceInKm);
-
-    @Query(value = "SELECT p FROM Profile p " +
-            "WHERE p.gender = :preferredGender " +
-            "AND FUNCTION('YEAR', CURRENT_DATE) - FUNCTION('YEAR', p.dateOfBirth) BETWEEN :minAge AND :maxAge", nativeQuery = true)
-    List<Profile> findProfilesByPreferences(
-            @Param("preferredGender") Gender preferredGender,
-            @Param("minAge") Integer minAge,
-            @Param("maxAge") Integer maxAge);
 
 }

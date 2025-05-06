@@ -12,9 +12,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -41,9 +43,18 @@ public class SearchService {
             Preferences userPreferences = userProfile.getPreferences();
             List<ProfileDTO> profilesBasedOnPreferences = searchByPreferences(userPreferences);
             List<ProfileDTO> unAnsweredProfiles = getUnAnsweredMatches(userId);
+
+            // Filter duplicates by userId, keeping the first occurrence
             List<ProfileDTO> results = new ArrayList<>(unAnsweredProfiles);
             results.addAll(profilesBasedOnPreferences);
-            return results;
+
+            Map<Long, ProfileDTO> uniqueProfiles = new LinkedHashMap<>();
+            for (ProfileDTO profile : results) {
+                if (!Objects.equals(profile.getUserId(), userId)) {
+                    uniqueProfiles.putIfAbsent(profile.getUserId(), profile);
+                }
+            }
+            return new ArrayList<>(uniqueProfiles.values());
         }
     }
 
@@ -72,8 +83,7 @@ public class SearchService {
         // If max age is 0 then, use default maxAge (99)
         int maxAge = preferences.getMaxAge() > 0 ? preferences.getMaxAge() : 99;
 
-        // List<ProfileDTO> filteredProfiles = findProfilesByPreferences(genderPreference, minAge, maxAge);
-        List<ProfileDTO> filteredProfiles = new ArrayList<>();
+        List<ProfileDTO> filteredProfiles = findProfilesByPreferences(genderPreference, minAge, maxAge);
 
         // If location preference is provided, filter by distance
         if (preferences.getLocationPreference() != null && preferences.getMaxDistance() > 0) {

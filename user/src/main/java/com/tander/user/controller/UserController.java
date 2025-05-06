@@ -57,9 +57,9 @@ public class UserController {
         return userService.login(loginDto);
     }
 
-    @PostMapping("/test")
-    public void test(@RequestBody TestDTO userDto) {
-        userService.jutsTest(userDto);
+    @PostMapping("/verify")
+    public void requestVerificationCode(@RequestBody TestDTO userDto) {
+        userService.requestVerificationCode(userDto);
     }
 
     @PutMapping("/{id}/notifications")

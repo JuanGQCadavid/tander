@@ -46,7 +46,7 @@ public class UserService {
         return user.map(this::mapToUserDto);
     }
 
-    public void jutsTest(TestDTO userDto){
+    public void requestVerificationCode(TestDTO userDto) {
         Notification notification = new Notification();
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setCode("090909");
@@ -67,7 +67,7 @@ public class UserService {
                 .phoneNumber(registrationDtoDto.getPhoneNumber())
                 .isVerified(false)
                 .build();
-        
+
         userRepository.save(user);
 
         Notification notification = new Notification();

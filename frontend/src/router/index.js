@@ -1,7 +1,9 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import LoginView from '@/views/LoginView.vue'
+import ProfileView from '@/views/ProfileView.vue'
+import ProfileEditView from '@/views/ProfileEditView.vue'
 
 const routes = [{
     path: '/',
@@ -18,6 +20,18 @@ const routes = [{
     name: "Login",
     component: LoginView,
 },
+{
+    path: "/profile/:userId",
+    name: "Profile",
+    component: ProfileView,
+    props: true
+},
+{
+    path: "/profile/:userId/edit",
+    name: "ProfileEdit",
+    component: ProfileEditView,
+    props: true
+},
     // {
     //     path: '/about',
     //     name: 'about',
@@ -30,7 +44,7 @@ const routes = [{
 ]
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 })
 

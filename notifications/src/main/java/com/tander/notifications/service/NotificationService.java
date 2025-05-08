@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.tander.commons.model.payloads.MatchNotification;
 import com.tander.commons.model.payloads.VerificationCode;
 import com.tander.notifications.controller.WebSocketHandler;
-
+import com.tander.notifications.dtos.UserDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ public class NotificationService {
 
     @Autowired
     private final WebSocketHandler webSocketHandler;
+
+    @Autowired
+    private final RestTemplate restTemplate;
 
     @Autowired
     private final SnsClient snsClient;
@@ -57,12 +62,9 @@ public class NotificationService {
         }
     }
 
-    // TWILO
-    public void sendMSM(String userId, String message) {
-        log.info("Email to " + userId + " with " +message);
-
-        // TODO -- Call to users backend
+    public String getUserPhoneOld(String userId){
         Map<String, String> userPhones = new HashMap<String,String>() {};
+
         // userPhones.put("andre", "+37256503971");
         // userPhones.put("kristofer", "+3725022180");
         // userPhones.put("juan", "+37253956581");
@@ -70,14 +72,35 @@ public class NotificationService {
         userPhones.put("1", "+37256503971");
         userPhones.put("2", "+3725022180");
         userPhones.put("3", "+37253956581");
+        
+        return userPhones.getOrDefault(userId, "Nope");
+    }
 
+    public String getUserPhoneCall(String userId){
+        String url = "http://localhost:8003/api/user/"+userId;
+        UserDTO response = restTemplate.getForObject(url, UserDTO.class);
+        return response != null ? response.getPhoneNumber() : null;
+    }
 
-        if (userPhones.getOrDefault(userId, "Nope").equals("Nope")){
+    // TWILO
+    public void sendMSM(String userId, String message) {
+        log.info("Email to " + userId + " with " +message);
+
+        String userphone = getUserPhoneCall(userId);
+        log.info("----------");
+        log.info("");
+        log.info(userphone);
+
+        if(userphone.isEmpty()){
+            userphone = getUserPhoneOld(userId);
+        }
+
+        if (userphone.equals("Nope")){
             log.info("user not found! " + userId);
             return;
         }
         
-        log.info("Message ID: " + publishMessage(userPhones.get(userId), message));
+        log.info("Message ID: " + publishMessage(userphone, message));
     }
 
     //SNS

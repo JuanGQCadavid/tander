@@ -3,7 +3,10 @@ import HomeView from '@/views/HomeView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
-import ProfileEditView from '@/views/ProfileEditView.vue'
+import ChatsView from '@/views/ChatsView.vue'
+import ChatingView from '@/views/ChatingView.vue'
+
+// import ProfileEditView from '@/views/ProfileEditView.vue'
 
 const routes = [{
     path: '/',
@@ -27,11 +30,22 @@ const routes = [{
     props: true
 },
 {
-    path: "/profile/:userId/edit",
-    name: "ProfileEdit",
-    component: ProfileEditView,
+    path: "/chat",
+    name: "Chats",
+    component: ChatsView,
+},
+{
+    path: "/chat/:chatId",
+    name: "Chat",
+    component: ChatingView,
     props: true
 },
+// {
+//     path: "/profile/:userId/edit",
+//     name: "ProfileEdit",
+//     component: ProfileEditView,
+//     props: true
+// },
     // {
     //     path: '/about',
     //     name: 'about',

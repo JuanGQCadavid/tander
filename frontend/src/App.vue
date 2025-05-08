@@ -4,19 +4,21 @@
         <router-link to="/register">Register</router-link>|
         <router-link to="/login">Login</router-link> |
         <router-link to="/profile">Profile</router-link> |
+        <router-link to="/chat">Chats</router-link> |
     </nav>
     <router-view />
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import HelloWorld from './components/HelloWorld.vue'
+
 
 export default {
     name: 'App',
     components: {
-        HelloWorld
+        // HelloWorld
     }
 }
 </script>

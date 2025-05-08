@@ -107,7 +107,7 @@ public class UserService {
                 .orElseThrow(() -> new AuthException("Invalid username or password"));
 
         // TODO: resolve hash
-        if (user.getPassword() != loginDto.getPassword()) {
+        if (!user.getPassword().equals(loginDto.getPassword())) {
             throw new AuthException("Invalid username or password");
         }
 

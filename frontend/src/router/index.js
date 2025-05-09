@@ -30,6 +30,17 @@ const routes = [{
     component: ProfileView,
     props: true
 },
+// {
+//     path: "/profile/",
+//     name: "Profile",
+//     component: ProfileView,
+// },
+{
+    path: "/profile/:userId/edit",
+    name: "ProfileEdit",
+    component: ProfileEditView,
+    props: true
+},
 {
     path: "/chat",
     name: "Chats",
@@ -45,12 +56,6 @@ const routes = [{
     path: "/search",
     name: 'Search',
     component: SearchView
-},
-{
-    path: "/profile/:userId/edit",
-    name: "ProfileEdit",
-    component: ProfileEditView,
-    props: true
 },
     // {
     //     path: '/about',

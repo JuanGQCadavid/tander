@@ -14,4 +14,7 @@ public interface ChatUserRepository extends CrudRepository<ChatUser, ChatUserKey
 
     @Query("SELECT cu FROM ChatUser cu WHERE cu.id.userId = :userId")
     List<ChatUser> findByUserId(@Param("userId") String userId);
+
+    @Query("SELECT cu FROM ChatUser cu WHERE cu.id.chatid = :chatId")
+    List<ChatUser> findMembersByChatId(@Param("chatId") String chatId);
 }

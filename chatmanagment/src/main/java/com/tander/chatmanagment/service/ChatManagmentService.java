@@ -6,9 +6,13 @@ import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import com.tander.chatmanagment.exceptions.MatchException;
 
 import com.tander.chatmanagment.dto.ChatDTO;
+import com.tander.chatmanagment.dto.ChatUsersDTO;
 import com.tander.chatmanagment.dto.MessagesDTO;
 import com.tander.chatmanagment.model.Chat;
 import com.tander.chatmanagment.model.ChatUser;
@@ -28,6 +32,7 @@ public class ChatManagmentService {
     private final ChatRepository chatRepository;
     private final ChatUserRepository chatUserRepository;   
     private final MessagesRepository messagesRepository; 
+    private final RestTemplate restTemplate;
 
     public List<MessagesDTO> getMessagesFromId(String lastMessageId, String chatId){
         return messagesRepository.findMessagesAfterMessageId(chatId, lastMessageId)
@@ -45,6 +50,34 @@ public class ChatManagmentService {
             .map(chOptional -> chOptional.get())
             .map(chat -> ChatDTO.fromChat(chat))
             .collect(Collectors.toList());
+    }
+
+    public List<ChatUsersDTO> getChatMembers(String userId, String chatId) {
+        log.info(userId);
+        List<ChatUsersDTO>  noFiltered = chatUserRepository.findMembersByChatId(chatId)
+            .stream()
+            .map(chatUser -> ChatUsersDTO.fromChatUser(chatUser))
+            .map(dto -> addUserAttributes(dto))
+            .collect(Collectors.toList());
+
+        List<ChatUsersDTO>  filtered =  noFiltered
+            .stream()
+            .filter(user -> !user.getUserId().equals(userId))
+            .collect(Collectors.toList());
+
+        if(filtered.size() == noFiltered.size()) {
+            throw new MatchException("Hmmm, you are not part of the crew... why are you attempting to read from a chat you dont belong? hu?");
+        }
+        return filtered;
+    }
+
+    public ChatUsersDTO addUserAttributes(ChatUsersDTO dto) {
+        String url = "http://localhost:8003/api/user/"+dto.getUserId();
+        ChatUsersDTO response = restTemplate.getForObject(url, ChatUsersDTO.class);
+        log.info(url);
+        log.info(response.toString());
+        dto.setEmail(response.getEmail());
+        return dto;
     }
 
 

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tander.chatmanagment.service.ChatManagmentService;
 import com.tander.chatmanagment.dto.ChatDTO;
+import com.tander.chatmanagment.dto.ChatUsersDTO;
 import com.tander.chatmanagment.dto.MessagesDTO;
 import com.tander.chatmanagment.exceptions.MatchException;
 
@@ -13,12 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
+@CrossOrigin(origins = "*")
 @Slf4j
 @RestController()
 @RequestMapping("/api/chat")
@@ -50,5 +53,9 @@ public class RESTController {
         return service.getChats(userId);
     }
     
+    @GetMapping("/members/{chatId}")
+    public List<ChatUsersDTO> getChatMembers(@RequestHeader String userId, @PathVariable String chatId) {
+        return service.getChatMembers(userId, chatId);
+    }
     
 }

@@ -93,7 +93,7 @@ public class ChatService {
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
 
             sessions.stream()
-            .filter(ses -> !ses.getId().equals(session.getId()))
+            // .filter(ses -> !ses.getId().equals(session.getId()))
             .forEach(ses -> {
                 sendMessageBack(ses, json);
             });

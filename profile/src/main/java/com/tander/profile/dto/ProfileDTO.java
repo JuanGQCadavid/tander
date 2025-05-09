@@ -24,6 +24,8 @@ public class ProfileDTO {
     @NotBlank(message = "Name is required")
     private String name;
 
+    private Long imageId;
+
     @NotNull(message = "Date of birth is required")
     private LocalDateTime dateOfBirth;
 

@@ -17,8 +17,11 @@ public class Profile {
 
     @Id
     private Long userId;
+
     private String name;
-    // TODO: image
+
+    private Long imageId;
+
     private LocalDateTime dateOfBirth;
 
     @Enumerated(EnumType.STRING)
@@ -33,5 +36,6 @@ public class Profile {
     })
     @Embedded
     private Location location;
+
     private String bio;
 }

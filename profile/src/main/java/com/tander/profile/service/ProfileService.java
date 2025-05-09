@@ -119,7 +119,8 @@ public class ProfileService {
     }
 
     public List<ProfileDTO> findProfilesByPreferences(Gender gender, Integer minAge, Integer maxAge) {
-        return profileRepository.findProfilesByPreferences(gender != null ? gender.name() : null, minAge, maxAge).stream()
+        return profileRepository.findProfilesByPreferences(gender != null ? gender.name() : null, minAge, maxAge)
+                .stream()
                 .map(this::mapToProfileDto)
                 .collect(Collectors.toList());
     }

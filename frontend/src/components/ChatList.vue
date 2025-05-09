@@ -35,7 +35,12 @@ export default {
     },
     methods: {
         enterChat(){
-            this.$router.push("/chat/"+ this.chatId);
+            this.$router.push({
+              name: "Chat", 
+              params: {
+                chatId: this.chatId,
+              },
+            });
         }
     },
     created(){

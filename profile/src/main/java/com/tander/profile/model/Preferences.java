@@ -4,6 +4,8 @@ import java.util.List;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Preferences {
 
+    @Enumerated(EnumType.STRING)
     private Gender genderPreference;
     private List<String> interests;
 

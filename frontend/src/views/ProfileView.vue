@@ -65,7 +65,7 @@
                     <div v-if="profile.preferences">
                         <div class="detail-item">
                             <span class="label">Interested in:</span>
-                            <span class="value">{{ formatGender(profile.preferences.gender) }}</span>
+                            <span class="value">{{ formatGender(profile.preferences.genderPreference) }}</span>
                         </div>
                         <div class="detail-item">
                             <span class="label">Age Range:</span>
@@ -143,10 +143,6 @@ export default {
             return age;
         },
         userId() {
-
-            console.log('Route param userId:', this.$route.params.userId);
-            console.log('Auth userId:', this.getUserIdFromAuth());
-
             return this.$route.params.userId || this.getUserIdFromAuth();
         },
         isOwnProfile() {
@@ -167,10 +163,9 @@ export default {
             this.error = null;
 
             try {
-                console.log("t1", this.userId)
-                console.log("t2", localStorage.getItem('user'))
                 const response = await axios.get(`http://localhost:8006/api/profiles/${this.userId}`);
                 this.profile = response.data;
+                console.log("User: ", response.data);
             } catch (error) {
                 console.error('Error fetching profile:', error);
                 this.error = error.response?.data?.message || 'Failed to load profile. Please try again later.';

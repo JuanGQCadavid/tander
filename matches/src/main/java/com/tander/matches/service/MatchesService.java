@@ -86,6 +86,11 @@ public class MatchesService {
         return matches.stream().map(this::mapToMatchDto).toList();
     }
 
+    public List<MatchDTO> getAnsweredMatches(Long profileId) {
+        List<Match> matches = new ArrayList<>(matchesRepository.findAnsweredMatches(profileId));
+        return matches.stream().map(this::mapToMatchDto).toList();
+    }
+
     public Optional<MatchDTO> getMatchByUserIds(Long user1Id, Long user2Id) {
         Optional<Match> match = matchesRepository.findByUserIds(user1Id, user2Id);
         return match.map(this::mapToMatchDto);

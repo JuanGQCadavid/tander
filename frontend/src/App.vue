@@ -1,13 +1,13 @@
 <template>
     <nav>
         <router-link to="/">Home</router-link> |
-        <router-link to="/register">Register</router-link>|
+        <router-link to="/register">Register</router-link> |
         <router-link to="/login">Login</router-link> |
         <router-link to="/profile">Profile</router-link> |
         <router-link to="/chat">Chats</router-link> |
+        <router-link to="/search">Search</router-link>
     </nav>
     <router-view />
-    <img alt="Vue logo" src="./assets/logo.png">
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
 </template>
 

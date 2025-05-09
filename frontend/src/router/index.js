@@ -5,6 +5,7 @@ import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import ChatsView from '@/views/ChatsView.vue'
 import ChatingView from '@/views/ChatingView.vue'
+import SearchView from "@/views/SearchView.vue";
 
 // import ProfileEditView from '@/views/ProfileEditView.vue'
 
@@ -40,6 +41,11 @@ const routes = [{
     component: ChatingView,
     props: true
 },
+    {
+        path: "/search",
+        name: 'Search',
+        component: SearchView
+    }
 // {
 //     path: "/profile/:userId/edit",
 //     name: "ProfileEdit",

@@ -9,6 +9,7 @@ import com.tander.search.service.SearchService;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/search")
 public class SearchController {

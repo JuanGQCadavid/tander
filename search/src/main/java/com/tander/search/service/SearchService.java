@@ -10,12 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +38,13 @@ public class SearchService {
             Preferences userPreferences = userProfile.getPreferences();
             List<ProfileDTO> profilesBasedOnPreferences = searchByPreferences(userPreferences);
             List<ProfileDTO> unAnsweredProfiles = getUnAnsweredMatches(userId);
+            List<ProfileDTO> answeredProfiles = getAnsweredMatches(userId);
+
+
+            Set<Long> answeredProfileIds = answeredProfiles.stream()
+                    .map(ProfileDTO::getUserId)
+                    .collect(Collectors.toSet());
+
 
             // Filter duplicates by userId, keeping the first occurrence
             List<ProfileDTO> results = new ArrayList<>(unAnsweredProfiles);
@@ -50,7 +52,7 @@ public class SearchService {
 
             Map<Long, ProfileDTO> uniqueProfiles = new LinkedHashMap<>();
             for (ProfileDTO profile : results) {
-                if (!Objects.equals(profile.getUserId(), userId)) {
+                if (!Objects.equals(profile.getUserId(), userId) && !answeredProfileIds.contains(profile.getUserId())) {
                     uniqueProfiles.putIfAbsent(profile.getUserId(), profile);
                 }
             }
@@ -174,8 +176,24 @@ public class SearchService {
                 .block();
 
         assert unAnsweredMatches != null;
-        List<ProfileDTO> profiles = new ArrayList<>(unAnsweredMatches.size());
-        for (MatchDTO match : unAnsweredMatches) {
+        return getProfiles(id, unAnsweredMatches);
+    }
+
+    public List<ProfileDTO> getAnsweredMatches(Long id) {
+        List<MatchDTO> answeredMatches = webClient.get()
+                .uri(matchesServiceUrl + "/api/matches/profile/{id}/answered", id)
+                .retrieve()
+                .bodyToFlux(MatchDTO.class)
+                .collectList()
+                .block();
+
+        assert answeredMatches != null;
+        return getProfiles(id, answeredMatches);
+    }
+
+    private List<ProfileDTO> getProfiles(Long id, List<MatchDTO> answeredMatches) {
+        List<ProfileDTO> profiles = new ArrayList<>(answeredMatches.size());
+        for (MatchDTO match : answeredMatches) {
             ProfileDTO profileToAdd;
             if (!Objects.equals(match.getProfileId1(), id)) {
                 profileToAdd = getProfileByUserId(match.getProfileId1());

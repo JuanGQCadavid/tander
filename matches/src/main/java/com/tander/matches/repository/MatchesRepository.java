@@ -24,4 +24,11 @@ public interface MatchesRepository extends CrudRepository<Match, Long> {
             "WHERE (m.profileId1 = :profileId AND m.profileStatus1 = com.tander.matches.model.Status.NO_ANSWER) " +
             "OR (m.profileId2 = :profileId AND m.profileStatus2 = com.tander.matches.model.Status.NO_ANSWER)")
     List<Match> findUnansweredMatches (Long profileId);
+
+
+    @Query("SELECT m from Match m " +
+            "WHERE (m.profileId1 = :profileId AND m.profileStatus1 != com.tander.matches.model.Status.NO_ANSWER) " +
+            "OR (m.profileId2 = :profileId AND m.profileStatus2 != com.tander.matches.model.Status.NO_ANSWER)")
+    List<Match> findAnsweredMatches(Long profileId);
+
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/matches")
 public class MatchesController {
@@ -28,6 +29,11 @@ public class MatchesController {
     @GetMapping("/profile/{id}/unAnswered")
     public List<MatchDTO> getUnansweredMatches(@PathVariable Long id) {
         return matchesService.getUnansweredMatches(id);
+    }
+
+    @GetMapping("/profile/{id}/answered")
+    public List<MatchDTO> getAnsweredMatches(@PathVariable Long id) {
+        return matchesService.getAnsweredMatches(id);
     }
 
     @GetMapping("/getMatch")

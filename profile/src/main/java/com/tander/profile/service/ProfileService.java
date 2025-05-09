@@ -51,6 +51,7 @@ public class ProfileService {
                 .preferences(profileDTO.getPreferences())
                 .location(profileDTO.getLocation())
                 .bio(profileDTO.getBio())
+                .imageId(profileDTO.getImageId())
                 .build();
         profileRepository.save(profile);
         log.info("Profile {} is added to DB", profile.getUserId());
@@ -65,6 +66,7 @@ public class ProfileService {
         profile.setGender(profileDTO.getGender());
         profile.setLocation(profileDTO.getLocation());
         profile.setBio(profileDTO.getBio());
+        profile.setImageId(profileDTO.getImageId());
         if (profileDTO.getPreferences() != null) {
             profile.setPreferences(profileDTO.getPreferences());
         }
@@ -145,6 +147,7 @@ public class ProfileService {
                 .preferences(profile.getPreferences())
                 .location(profile.getLocation())
                 .bio(profile.getBio())
+                .imageId(profile.getImageId())
                 .build();
     }
 }

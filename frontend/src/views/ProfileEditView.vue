@@ -21,6 +21,42 @@
         <div v-else class="edit-content">
             <h1>{{ isCreatingNew ? 'Create Profile' : 'Edit Profile' }}</h1>
 
+            <!-- Profile Image Section -->
+            <div class="profile-image-section">
+                <div class="profile-image-container">
+                    <img v-if="profileImageUrl" :src="profileImageUrl" alt="Profile Image" class="profile-image" />
+                    <div v-else class="profile-image-placeholder">
+                        <span>{{ form.name ? form.name.charAt(0).toUpperCase() : 'U' }}</span>
+                    </div>
+                </div>
+                <div class="profile-image-actions">
+                    <label for="profileImageUpload" class="upload-button">
+                        {{ profileImageUrl ? 'Change Image' : 'Upload Image' }}
+                        <input 
+                            type="file" 
+                            id="profileImageUpload" 
+                            accept="image/*" 
+                            @change="handleImageUpload" 
+                            class="hidden-input" 
+                        />
+                    </label>
+                    <label 
+                        v-if="profileImageUrl" 
+                        @click="removeProfileImage" 
+                        class="remove-image-button"
+                    >
+                        Remove Image
+                    </label>
+                </div>
+                <div v-if="uploadProgress > 0 && uploadProgress < 100" class="upload-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
+                    </div>
+                    <span>{{ uploadProgress }}%</span>
+                </div>
+                <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
+            </div>
+
             <div class="tabs">
                 <button @click="activeTab = 'personal'" :class="['tab-button', { active: activeTab === 'personal' }]">
                     Personal Info
@@ -88,20 +124,16 @@
                     <label>Interested in</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" v-model="form.preferences.gender" value="MALE" />
+                            <input type="radio" v-model="form.preferences.genderPreference" value="MALE" />
                             <span>Male</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" v-model="form.preferences.gender" value="FEMALE" />
+                            <input type="radio" v-model="form.preferences.genderPreference" value="FEMALE" />
                             <span>Female</span>
                         </label>
                         <label class="radio-label">
-                            <input type="radio" v-model="form.preferences.gender" value="OTHER" />
+                            <input type="radio" v-model="form.preferences.genderPreference" value="OTHER" />
                             <span>Other</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" v-model="form.preferences.gender" value="ANY" />
-                            <span>Any</span>
                         </label>
                     </div>
                 </div>
@@ -214,6 +246,7 @@ export default {
                 dateOfBirth: '',
                 gender: null,
                 bio: '',
+                imageId: null,
                 preferences: {
                     gender: null,
                     interests: [],
@@ -232,7 +265,11 @@ export default {
             loading: true,
             saving: false,
             error: null,
-            errors: {}
+            errors: {},
+            profileImageUrl: null,
+            uploadProgress: 0,
+            fileUploadUrl: 'http://localhost:8010/api/files',
+            fileServiceUrl: 'http://localhost:8010/api/files'
         };
     },
     computed: {
@@ -240,9 +277,6 @@ export default {
             return this.$route.params.userId || this.getUserIdFromAuth();
         },
         isOwnProfile() {
-            console.log("t1", this.userId)
-            console.log("t2", this.getUserIdFromAuth())
-            console.log("t3", this.$route.params.userId === this.getUserIdFromAuth());
             return this.$route.params.userId == this.getUserIdFromAuth();
         }
     },
@@ -303,6 +337,11 @@ export default {
                     this.form.preferences.interests = [];
                 }
 
+                // Fetch image if imageId exists
+                if (this.form.imageId) {
+                    this.fetchProfileImage(this.form.imageId);
+                }
+
             } catch (error) {
                 console.error('Error fetching profile:', error);
                 if (error.response && error.response.status === 404) {
@@ -316,6 +355,73 @@ export default {
             }
         },
 
+        async fetchProfileImage(imageId) {
+            try {
+                const response = await axios.get(`${this.fileServiceUrl}/file/${imageId}`);
+                this.profileImageUrl = response.data.fileUrl;
+            } catch (error) {
+                console.error('Error fetching profile image:', error);
+                this.profileImageUrl = null;
+            }
+        },
+
+        async handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Reset file input
+            event.target.value = '';
+
+            // Validate file
+            if (!file.type.startsWith('image/')) {
+                this.errors = { ...this.errors, image: 'Please select an image file' };
+                return;
+            }
+
+            // File size validation (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                this.errors = { ...this.errors, image: 'Image size should not exceed 5MB' };
+                return;
+            }
+
+            this.errors = { ...this.errors, image: null };
+            this.uploadProgress = 0;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await axios.post(this.fileUploadUrl, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    onUploadProgress: progressEvent => {
+                        this.uploadProgress = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                    }
+                });
+
+                // Update the profile with the new image ID
+                this.form.imageId = response.data.id;
+                this.profileImageUrl = response.data.fileUrl;
+                
+                // Automatically save the profile with the new image ID
+                await this.savePersonalInfo();
+                
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                this.errors = { ...this.errors, image: 'Failed to upload image. Please try again.' };
+                this.uploadProgress = 0;
+            }
+        },
+
+        removeProfileImage() {
+            this.profileImageUrl = null;
+            this.form.imageId = null;
+            this.uploadProgress = 0;
+        },
+
         createNewProfile() {
             this.isCreatingNew = true;
             this.error = null;
@@ -327,6 +433,7 @@ export default {
                 dateOfBirth: '',
                 gender: null,
                 bio: '',
+                imageId: null,
                 preferences: {
                     gender: 'ANY',
                     interests: [],
@@ -343,6 +450,8 @@ export default {
             this.dateOfBirthInput = '';
             this.newInterest = '';
             this.errors = {};
+            this.profileImageUrl = null;
+            this.uploadProgress = 0;
         },
 
         validatePersonalInfo() {
@@ -566,6 +675,14 @@ export default {
             } else {
                 // If editing an existing profile, reset form to original values
                 this.form = JSON.parse(JSON.stringify(this.originalProfile));
+
+                // Reset image URL to original if there was one
+                if (this.form.imageId) {
+                    this.fetchProfileImage(this.form.imageId);
+                } else {
+                    this.profileImageUrl = null;
+                }
+                
                 this.$router.push(`/profile/${this.userId}`);
             }
         }
@@ -901,4 +1018,90 @@ textarea {
         gap: 10px;
     }
 }
+
+/* Profile Image Styles */
+.profile-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.profile-image-container {
+    width: 400px;
+    height: 400px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border: 3px solid #4a90e2;
+    position: relative;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #e8f0fe;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 64px;
+    font-weight: bold;
+    color: #4a90e2;
+}
+
+.profile-image-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.upload-button {
+    padding: 8px 16px;
+    background: #4a90e2;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.remove-image-button {
+    padding: 8px 16px;
+    background: white;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.upload-progress {
+    width: 100%;
+    max-width: 250px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.progress-bar {
+    height: 10px;
+    background-color: #eee;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #4a90e2;
+    transition: width 0.3s ease;
+}
+
 </style>

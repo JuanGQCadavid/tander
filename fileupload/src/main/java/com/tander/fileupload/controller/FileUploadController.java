@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = "*")
 @RestController
 @Slf4j
 @RequestMapping("/api/files")

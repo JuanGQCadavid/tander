@@ -19,6 +19,16 @@
                 </div>
             </div>
 
+            <!-- Profile Image -->
+            <div class="profile-image-section">
+                <div class="profile-image-container">
+                    <img v-if="profileImageUrl" :src="profileImageUrl" alt="Profile Image" class="profile-image" />
+                    <div v-else class="profile-image-placeholder">
+                        <span>{{ profile.name ? profile.name.charAt(0).toUpperCase() : 'U' }}</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="profile-details">
                 <div class="profile-section">
                     <h2>Personal Information</h2>
@@ -121,10 +131,13 @@ export default {
                     maxAge: 50
                 },
                 location: null,
-                bio: ''
+                bio: '',
+                imageId: null
             },
             loading: true,
-            error: null
+            error: null,
+            profileImageUrl: null,
+            fileServiceUrl: 'http://localhost:8010/api/files'
         };
     },
     computed: {
@@ -166,11 +179,28 @@ export default {
                 const response = await axios.get(`http://localhost:8006/api/profiles/${this.userId}`);
                 this.profile = response.data;
                 console.log("User: ", response.data);
+                
+                // Fetch profile image if imageId exists
+                if (this.profile.imageId) {
+                    this.fetchProfileImage(this.profile.imageId);
+                } else {
+                    this.profileImageUrl = null;
+                }
             } catch (error) {
                 console.error('Error fetching profile:', error);
                 this.error = error.response?.data?.message || 'Failed to load profile. Please try again later.';
             } finally {
                 this.loading = false;
+            }
+        },
+        
+        async fetchProfileImage(imageId) {
+            try {
+                const response = await axios.get(`${this.fileServiceUrl}/file/${imageId}`);
+                this.profileImageUrl = response.data.fileUrl;
+            } catch (error) {
+                console.error('Error fetching profile image:', error);
+                this.profileImageUrl = null;
             }
         },
 
@@ -237,7 +267,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     border-bottom: 1px solid #eee;
     padding-bottom: 15px;
 }
@@ -245,6 +275,41 @@ export default {
 .profile-header h1 {
     margin: 0;
     color: #333;
+}
+
+/* Profile Image Styles */
+.profile-image-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.profile-image-container {
+    width: 400px;
+    height: 400px;
+    overflow: hidden;
+    border: 3px solid #4a90e2;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.profile-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #e8f0fe;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 86px;
+    font-weight: bold;
+    color: #4a90e2;
 }
 
 .edit-button {

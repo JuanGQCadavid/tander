@@ -1,12 +1,21 @@
 <template>
     <div class="about">
-      <h1>This is the chat space for chat  {{ chatId }}</h1>
+      <h1>{{ chatTitle }}</h1>
+      <h3>{{ getPowerMessage() }}</h3>
     </div>
     <div class="chat-container">
         <div class="messages">
         <div v-for="msg in messages" :key="msg.id" class="message">
-            <strong>{{ msg.senderId }}:</strong> {{ msg.textContent }}
-            <i>{{ msg.dateOfCreation }}</i>
+            <div v-if="msg.senderId === userId" class="message-myself">
+                <p> {{ msg.textContent }} <br> {{ msg.dateOfCreation }}  </p>
+                <!-- <br>
+                <i>{{ msg.dateOfCreation }}</i> -->
+            </div>
+            <div v-if="msg.senderId !== userId" class="message-other">
+                <p> {{ msg.textContent }} <br> {{ msg.dateOfCreation }}  </p>
+            </div>
+
+
         </div>
         </div>
         
@@ -35,12 +44,51 @@ export default {
             ws: null,
             newMessage: '',
             userId: '1',
+            chatTitle: "",
         }
     },
     props: {
         chatId: {type: String, required: true},
     },
     methods: {
+        getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        },
+        getPowerMessage(){
+            const possibles= [
+                "... The begining of a new netflix romance movie",
+                "Somewhere, Taylor Swift just started writing a song about this.",
+                "Insert dramatic romantic music and stolen glances.",
+                "Flirting mode activated",
+                "Warning: This chat may cause butterflies",
+            ]
+            return possibles[this.getRandomInt(0, 4)]
+        },
+        fetchMembers(chatId, userId){
+            fetch(`http://localhost:8009/api/chat/members/${chatId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'userId': userId,
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetching members")
+                    console.log(data)
+                    data.forEach(member => {
+                        if (member.userId !== userId) {
+                            this.chatTitle = member.email + " and you."
+                        }
+                    })
+
+                })
+                .catch(error => {
+                    console.error('Error fetching chats:', error);
+                });
+        },
         fetHistory(userId, chatId) {
             fetch(`http://localhost:8009/api/chat/history/${chatId}`, {
                 method: 'GET',
@@ -119,6 +167,7 @@ export default {
         console.log('ChatView component is created')
         this.createWebSocket()
         this.fetHistory(this.userId, this.chatId)
+        this.fetchMembers(this.chatId, this.userId)
     }
 
 }
@@ -148,6 +197,18 @@ export default {
   margin-bottom: 5px;
 }
 
+.message-other {
+    display: flex;
+    justify-content: left;
+
+}
+
+.message-myself {
+    display: flex;
+    justify-content: right
+    
+}
+
 .input-area {
   display: flex;
   gap: 10px;
@@ -168,4 +229,6 @@ button {
   color: white;
   cursor: pointer;
 }
+
+
 </style>

@@ -61,13 +61,6 @@
                     <div v-else class="detail-item">
                         <span class="value">No location set</span>
                     </div>
-
-                    <div v-if="profile.location" class="location-map">
-                        <div class="map-placeholder">
-                            <div class="map-pin"></div>
-                            <p>Map View</p>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="profile-section">
@@ -378,44 +371,6 @@ export default {
 .no-interests {
     color: #888;
     font-style: italic;
-}
-
-.location-map {
-    margin-top: 15px;
-    height: 200px;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.map-placeholder {
-    height: 100%;
-    background-color: #e8f0fe;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #4a90e2;
-    position: relative;
-}
-
-.map-pin {
-    width: 20px;
-    height: 20px;
-    background-color: #4a90e2;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    margin-bottom: 10px;
-}
-
-.map-pin:after {
-    content: '';
-    width: 10px;
-    height: 10px;
-    background-color: white;
-    position: absolute;
-    border-radius: 50%;
-    top: 5px;
-    left: 5px;
 }
 
 @media (max-width: 600px) {

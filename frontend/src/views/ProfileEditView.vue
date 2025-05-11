@@ -9,15 +9,6 @@
             <p>Loading profile data...</p>
         </div>
 
-        <div v-else-if="error && !isCreatingNew" class="error-container">
-            <h2>Error Loading Profile</h2>
-            <p>{{ error }}</p>
-            <div class="error-actions">
-                <button @click="fetchProfile" class="retry-button">Retry</button>
-                <button @click="createNewProfile" class="create-button">Create New Profile</button>
-            </div>
-        </div>
-
         <div v-else class="edit-content">
             <h1>{{ isCreatingNew ? 'Create Profile' : 'Edit Profile' }}</h1>
 
@@ -119,7 +110,7 @@
             </form>
 
             <!-- Preferences Form -->
-            <form v-if="activeTab === 'preferences'" @submit.prevent="savePreferences" class="edit-form">
+            <form v-if="activeTab === 'preferences'" @submit.prevent="savePersonalInfo" class="edit-form">
                 <div class="form-group">
                     <label>Interested in</label>
                     <div class="radio-group">
@@ -193,7 +184,7 @@
             </form>
 
             <!-- Location Form -->
-            <form v-if="activeTab === 'location'" @submit.prevent="saveLocation" class="edit-form">
+            <form v-if="activeTab === 'location'" @submit.prevent="savePersonalInfo" class="edit-form">
                 <div class="form-group">
                     <label for="latitude">Latitude</label>
                     <input type="number" id="latitude" v-model.number="form.location.latitude" step="0.000001" min="-90"
@@ -206,12 +197,6 @@
                     <input type="number" id="longitude" v-model.number="form.location.longitude" step="0.000001"
                         min="-180" max="180" required />
                     <span v-if="errors.longitude" class="error-message">{{ errors.longitude }}</span>
-                </div>
-
-                <div class="location-map">
-                    <div class="map-placeholder">
-                        <div class="map-pin"></div>
-                    </div>
                 </div>
 
                 <div class="form-group">
@@ -248,7 +233,7 @@ export default {
                 bio: '',
                 imageId: null,
                 preferences: {
-                    gender: null,
+                    genderPreference: null,
                     interests: [],
                     maxDistance: 50,
                     minAge: 18,
@@ -345,10 +330,13 @@ export default {
             } catch (error) {
                 console.error('Error fetching profile:', error);
                 if (error.response && error.response.status === 404) {
-                    // Profile not found, offer to create a new one
-                    this.error = 'No profile found for this user. Would you like to create a new profile?';
+                    // Profile not found, automatically create a new one
+                    console.log('Profile not found, creating new profile');
+                    this.createNewProfile();
                 } else {
-                    this.error = error.response?.data?.message || 'Failed to load profile. Please try again later.';
+                    console.error('Other error occurred:', error);
+                    // For other errors, we still want to allow creating a new profile
+                    this.createNewProfile();
                 }
             } finally {
                 this.loading = false;
@@ -435,7 +423,7 @@ export default {
                 bio: '',
                 imageId: null,
                 preferences: {
-                    gender: 'ANY',
+                    genderPreference: null,
                     interests: [],
                     maxDistance: 50,
                     minAge: 18,
@@ -538,6 +526,7 @@ export default {
             if (!this.validatePersonalInfo()) return;
 
             this.saving = true;
+            console.log(this.form)
 
             try {
                 let response;
@@ -908,46 +897,7 @@ textarea {
     cursor: pointer;
     font-size: 18px;
     font-weight: bold;
-    padding: 0 2px;
-}
-
-.location-map {
-    margin: 20px 0;
-    height: 250px;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.map-placeholder {
-    height: 100%;
-    background-color: #e8f0fe;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #4a90e2;
-    position: relative;
-}
-
-.map-pin {
-    width: 20px;
-    height: 20px;
-    background-color: #4a90e2;
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    margin-bottom: 10px;
-}
-
-.map-pin:after {
-    content: '';
-    width: 10px;
-    height: 10px;
-    background-color: white;
-    position: absolute;
-    border-radius: 50%;
-    top: 5px;
-    left: 5px;
-}
+    padding: 0 2px;}
 
 .current-location-button {
     padding: 8px 16px;

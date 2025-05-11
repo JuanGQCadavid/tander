@@ -91,6 +91,9 @@ export default {
                 if (response.data) {
                     const userData = response.data;
                     sessionStorage.setItem('user', JSON.stringify(userData));
+                    window.dispatchEvent(new CustomEvent('userLoggedIn', { 
+                        detail: userData 
+                    }));
                     this.$router.push('/home');
                 }
             } catch (error) {

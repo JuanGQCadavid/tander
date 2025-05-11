@@ -122,12 +122,11 @@ export default {
 
                 console.log('Registration successful:', response.data);
 
-                // Store user data or token if returned
                 if (response.data) {
                     localStorage.setItem('user', JSON.stringify(response.data));
+                    this.$router.push('/profile/' + response.data.id + "/edit/");
                 }
 
-                this.$router.push('/home');
             } catch (error) {
                 console.error('Registration error:', error);
                 this.apiError = error.response?.data?.message ||

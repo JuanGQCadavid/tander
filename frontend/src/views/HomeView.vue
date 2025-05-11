@@ -17,7 +17,7 @@
      <div v-else class="no-profiles">
        <p>No new profiles found, try expanding your filters</p>
      </div>
-    </div>
+   </div>
 </template>
 
 <script>
@@ -25,8 +25,6 @@ import axios from 'axios';
 
 const searchUrl = 'http://localhost:8008/api/search';
 const matchUrl = 'http://localhost:8007/api/matches'
-// TODO: get user id from logged in user
-const currentUserId = 2;
 
 export default {
   data() {
@@ -42,8 +40,12 @@ export default {
     },
   },
   methods: {
+    getUserIdFromAuth() {
+      const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+      return user.id;
+    },
     fetchProfiles() {
-      axios.get(searchUrl + `?userId=${currentUserId}`)
+      axios.get(searchUrl + `?userId=${this.getUserIdFromAuth()}`)
           .then(response => {
             this.profiles = response.data;
             if (this.profiles.length > 0) {
@@ -75,7 +77,7 @@ export default {
     },
 
     fetchMatch(profileId) {
-      axios.get(matchUrl + `/getMatch?profileId1=${currentUserId}&profileId2=${profileId}`)
+      axios.get(matchUrl + `/getMatch?profileId1=${this.getUserIdFromAuth()}&profileId2=${profileId}`)
           .then(response => {
             this.currentMatch = response.data;
           })
@@ -84,7 +86,7 @@ export default {
 
     createMatch(status) {
       const newMatch = {
-        profileId1: currentUserId,
+        profileId1: this.getUserIdFromAuth(),
         profileId2: this.currentProfile.userId,
         profileStatus1: status
       }
@@ -96,8 +98,8 @@ export default {
     updateMatch(status) {
       const updatedMatch = {
         ...this.currentMatch,
-        profileStatus1: currentUserId === this.currentMatch.profileId1 ? status : this.currentMatch.profileStatus1,
-        profileStatus2: currentUserId === this.currentMatch.profileId2 ? status : this.currentMatch.profileStatus2
+        profileStatus1: this.getUserIdFromAuth() === this.currentMatch.profileId1 ? status : this.currentMatch.profileStatus1,
+        profileStatus2: this.getUserIdFromAuth() === this.currentMatch.profileId2 ? status : this.currentMatch.profileStatus2
       }
 
       axios.put(matchUrl + `/${this.currentMatch.matchId}`, updatedMatch)
@@ -131,6 +133,10 @@ export default {
     },
   },
   created() {
+    const userId = this.getUserIdFromAuth();
+    if (!userId) {
+      this.$router.push(`/login`)
+    }
     this.fetchProfiles();
   }
 };

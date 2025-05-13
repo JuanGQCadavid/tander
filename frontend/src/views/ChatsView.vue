@@ -17,6 +17,7 @@ export default {
   },
   data: () => {
     return {
+        userId: "",
         chats: []
     }
   },
@@ -79,8 +80,24 @@ export default {
     }
   },
   mounted(){
+
+        const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+
+        if(user.id == null) {
+            this.$router.push({
+              name: "Login", 
+            });
+        }
+
         console.log('ChatView component is created')
-        this.fetchChats("1")
+        console.log("user ID - " + user.id)
+        this.fetchChats(user.id)
+        this.userId = user.id
+        return
+
+
+
+
     }
 }
 </script>

@@ -6,12 +6,12 @@
     <div class="chat-container">
         <div class="messages">
         <div v-for="msg in messages" :key="msg.id" class="message">
-            <div v-if="msg.senderId === userId" class="message-myself">
+            <div v-if="msg.senderId == userId" class="message-myself">
                 <p> {{ msg.textContent }} <br> {{ msg.dateOfCreation }}  </p>
                 <!-- <br>
                 <i>{{ msg.dateOfCreation }}</i> -->
             </div>
-            <div v-if="msg.senderId !== userId" class="message-other">
+            <div v-if="msg.senderId != userId" class="message-other">
                 <p> {{ msg.textContent }} <br> {{ msg.dateOfCreation }}  </p>
             </div>
 
@@ -43,7 +43,7 @@ export default {
             messages: [],
             ws: null,
             newMessage: '',
-            userId: '1',
+            userId: '',
             chatTitle: "",
         }
     },
@@ -165,6 +165,18 @@ export default {
     },
     mounted(){
         console.log('ChatView component is created')
+        const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+
+        if(user.id == null) {
+            this.$router.push({
+              name: "Login", 
+            });
+        }
+
+        console.log("user ID - " + user.id)
+        this.userId = user.id
+
+
         this.createWebSocket()
         this.fetHistory(this.userId, this.chatId)
         this.fetchMembers(this.chatId, this.userId)

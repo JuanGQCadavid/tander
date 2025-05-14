@@ -23,6 +23,7 @@ public class User {
     private String password;
     private Boolean isVerified;
     private LocalDateTime createdAt;
+    private String role;
 
     @Embedded
     private NotificationPreference notificationPreference;

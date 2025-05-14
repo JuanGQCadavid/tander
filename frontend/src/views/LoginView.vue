@@ -86,14 +86,13 @@ export default {
             try {
                 const response = await axios.post('http://localhost:8003/api/user/login', this.form);
 
-                console.log('Login successful:', response.data);
-
                 if (response.data) {
                     const userData = response.data;
                     sessionStorage.setItem('user', JSON.stringify(userData));
                     window.dispatchEvent(new CustomEvent('userLoggedIn', { 
                         detail: userData 
                     }));
+                    this.$store
                     this.$router.push('/home');
                 }
             } catch (error) {

@@ -2,7 +2,13 @@ package com.tander.user.controller;
 
 import java.util.Optional;
 
+import com.tander.user.exception.AuthException;
+import com.tander.user.jwt.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/user")
+@Slf4j
 public class UserController {
     // TODO: field validation
     // TODO: permissions
@@ -33,6 +40,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @GetMapping("/{id}")
     public Optional<UserDto> getUserById(@PathVariable Long id) {
@@ -55,8 +68,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserDto login(@RequestBody LoginDto loginDto) {
-        return userService.login(loginDto);
+    public String login(@RequestBody LoginDto loginDto) {
+        log.info("Logging in has started: {}", loginDto);
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+            log.info("authentication result: {}", authentication);
+            if (authentication.isAuthenticated()) {
+                String token = jwtService.generateToken(loginDto.getEmail());
+                log.info("JWT token: {}", token);
+                return token;
+            } else {
+                log.error("Auth has failed :(");
+                throw new AuthException("Auth has failed");
+            }
+        } catch (Exception e) {
+            log.error("Ming error: {}", e.getMessage());
+            throw new AuthException("Auth has failed.......");
+        }
     }
 
     @PostMapping("/verify")

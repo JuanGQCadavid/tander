@@ -94,7 +94,7 @@ export default {
                     window.dispatchEvent(new CustomEvent('userLoggedIn', { 
                         detail: userData 
                     }));
-                    this.$router.push('/home');
+                    this.$router.push('/');
                 }
             } catch (error) {
                 console.error('Login error:', error);

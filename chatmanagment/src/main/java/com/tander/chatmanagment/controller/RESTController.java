@@ -15,11 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-
 
 @CrossOrigin(origins = "*")
 @Slf4j
@@ -31,31 +31,35 @@ public class RESTController {
 
     @GetMapping("/history/{chatId}")
     public List<MessagesDTO> getMethodName(
-        @RequestParam(required = false) String fromId, 
-        @PathVariable String chatId,
-        @RequestHeader String userId
-        ) {
+            @RequestParam(required = false) String fromId,
+            @PathVariable String chatId,
+            @RequestHeader String userId) {
 
-            if (!service.isUserOnChat(userId, chatId)){
-                log.warn("UserId " + userId + " try to access chat id  " + chatId + " but he is not part of the gang");
-                throw new MatchException("Hmmm, you are not part of the crew... why are you attempting to read from a chat you dont belong? hu?");
-            }
+        if (!service.isUserOnChat(userId, chatId)) {
+            log.warn("UserId " + userId + " try to access chat id  " + chatId + " but he is not part of the gang");
+            throw new MatchException(
+                    "Hmmm, you are not part of the crew... why are you attempting to read from a chat you dont belong? hu?");
+        }
 
-            if(fromId == null) {
-                return service.getMessages(chatId);
-            }
+        if (fromId == null) {
+            return service.getMessages(chatId);
+        }
 
-            return service.getMessagesFromId(fromId, chatId);
+        return service.getMessagesFromId(fromId, chatId);
     }
 
     @GetMapping("/")
     public List<ChatDTO> getChats(@RequestHeader String userId) {
         return service.getChats(userId);
     }
-    
+
     @GetMapping("/members/{chatId}")
     public List<ChatUsersDTO> getChatMembers(@RequestHeader String userId, @PathVariable String chatId) {
         return service.getChatMembers(userId, chatId);
     }
-    
+
+    @DeleteMapping("/{id}")
+    public void deleteChat(@PathVariable String id) {
+        service.deleteChat(id);
+    }
 }

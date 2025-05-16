@@ -24,7 +24,7 @@ public class ProfileController {
     @Value("${file.service.url:http://file-service}")
     private String fileServiceUrl;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<ProfileDTO>> getAllProfiles() {
         return ResponseEntity.ok(profileService.getAllProfiles());
     }

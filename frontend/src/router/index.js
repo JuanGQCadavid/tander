@@ -8,6 +8,7 @@ import ChatingView from '@/views/ChatingView.vue'
 import SearchView from "@/views/SearchView.vue";
 
 import ProfileEditView from '@/views/ProfileEditView.vue'
+import AdminView from '@/views/AdminView.vue'
 
 const routes = [{
     path: '/',
@@ -23,6 +24,11 @@ const routes = [{
     path: "/login",
     name: "Login",
     component: LoginView,
+},
+{
+    path: "/admin",
+    name: "Admin",
+    component: AdminView,
 },
 {
     path: "/profile/:userId",

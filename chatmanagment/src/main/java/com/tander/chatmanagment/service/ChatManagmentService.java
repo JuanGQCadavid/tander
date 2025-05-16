@@ -1,4 +1,5 @@
 package com.tander.chatmanagment.service;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,11 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ChatManagmentService {
     private final ChatRepository chatRepository;
-    private final ChatUserRepository chatUserRepository;   
-    private final MessagesRepository messagesRepository; 
+    private final ChatUserRepository chatUserRepository;
+    private final MessagesRepository messagesRepository;
     private final RestTemplate restTemplate;
 
-    public List<MessagesDTO> getMessagesFromId(String lastMessageId, String chatId){
+    public List<MessagesDTO> getMessagesFromId(String lastMessageId, String chatId) {
         return messagesRepository.findMessagesAfterMessageId(chatId, lastMessageId)
                 .stream()
                 .map(chat -> MessagesDTO.fromMessages(chat))
@@ -44,35 +45,36 @@ public class ChatManagmentService {
     public List<ChatDTO> getChats(String userId) {
         log.info(userId);
         return chatUserRepository.findByUserId(userId)
-            .stream()
-            .map(cu -> chatRepository.findById(cu.getId().getChatid()))
-            .filter(chOptional -> chOptional.isPresent())
-            .map(chOptional -> chOptional.get())
-            .map(chat -> ChatDTO.fromChat(chat))
-            .collect(Collectors.toList());
+                .stream()
+                .map(cu -> chatRepository.findById(cu.getId().getChatid()))
+                .filter(chOptional -> chOptional.isPresent())
+                .map(chOptional -> chOptional.get())
+                .map(chat -> ChatDTO.fromChat(chat))
+                .collect(Collectors.toList());
     }
 
     public List<ChatUsersDTO> getChatMembers(String userId, String chatId) {
         log.info(userId);
-        List<ChatUsersDTO>  noFiltered = chatUserRepository.findMembersByChatId(chatId)
-            .stream()
-            .map(chatUser -> ChatUsersDTO.fromChatUser(chatUser))
-            .map(dto -> addUserAttributes(dto))
-            .collect(Collectors.toList());
+        List<ChatUsersDTO> noFiltered = chatUserRepository.findMembersByChatId(chatId)
+                .stream()
+                .map(chatUser -> ChatUsersDTO.fromChatUser(chatUser))
+                .map(dto -> addUserAttributes(dto))
+                .collect(Collectors.toList());
 
-        List<ChatUsersDTO>  filtered =  noFiltered
-            .stream()
-            .filter(user -> !user.getUserId().equals(userId))
-            .collect(Collectors.toList());
+        List<ChatUsersDTO> filtered = noFiltered
+                .stream()
+                .filter(user -> !user.getUserId().equals(userId))
+                .collect(Collectors.toList());
 
-        if(filtered.size() == noFiltered.size()) {
-            throw new MatchException("Hmmm, you are not part of the crew... why are you attempting to read from a chat you dont belong? hu?");
+        if (filtered.size() == noFiltered.size()) {
+            throw new MatchException(
+                    "Hmmm, you are not part of the crew... why are you attempting to read from a chat you dont belong? hu?");
         }
         return filtered;
     }
 
     public ChatUsersDTO addUserAttributes(ChatUsersDTO dto) {
-        String url = "http://localhost:8003/api/user/"+dto.getUserId();
+        String url = "http://localhost:8003/api/user/" + dto.getUserId();
         ChatUsersDTO response = restTemplate.getForObject(url, ChatUsersDTO.class);
         log.info(url);
         log.info(response.toString());
@@ -80,8 +82,7 @@ public class ChatManagmentService {
         return dto;
     }
 
-
-    public List<MessagesDTO> getMessages(String chatId){
+    public List<MessagesDTO> getMessages(String chatId) {
         return messagesRepository.findByChatId(chatId)
                 .stream()
                 .map(msg -> MessagesDTO.fromMessages(msg))
@@ -89,61 +90,58 @@ public class ChatManagmentService {
     }
 
     public boolean isUserOnChat(String userId, String chatId) {
-        Optional<ChatUser>  user = chatUserRepository.findById(
-            ChatUserKey.builder()
+        Optional<ChatUser> user = chatUserRepository.findById(
+                ChatUserKey.builder()
                         .chatid(chatId)
                         .userId(userId)
-                        .build()
-        );
+                        .build());
 
-        if(
-            user.isPresent() && 
-            user.get().getId().getUserId().equals(userId) && 
-            user.get().getId().getChatid().equals(chatId)
-        ){
+        if (user.isPresent() &&
+                user.get().getId().getUserId().equals(userId) &&
+                user.get().getId().getChatid().equals(chatId)) {
             return true;
         }
 
         return false;
     }
 
-    public void openChat(MatchNotification notification){
+    public void openChat(MatchNotification notification) {
         String chatId = UUID.randomUUID().toString();
         OffsetDateTime timeOf = OffsetDateTime.now();
-        
-        log.info("Creating chat with id "+ chatId);
+
+        log.info("Creating chat with id " + chatId);
         chatRepository.save(
-            Chat.builder()
-                .id(chatId)
-                .dateOfCreation(timeOf)
-                .isActive(true)
-                .build()
-        );
+                Chat.builder()
+                        .id(chatId)
+                        .dateOfCreation(timeOf)
+                        .isActive(true)
+                        .build());
 
-        log.info("Adding user with id "+ notification.getUserIDA());
+        log.info("Adding user with id " + notification.getUserIDA());
         chatUserRepository.save(
-            ChatUser.builder()
-                    .dateOfJoining(timeOf)
-                    .id(
-                        ChatUserKey.builder()
-                                    .chatid(chatId)
-                                    .userId(notification.getUserIDA())
-                                    .build()
-                    )
-                    .build()
-        );
+                ChatUser.builder()
+                        .dateOfJoining(timeOf)
+                        .id(
+                                ChatUserKey.builder()
+                                        .chatid(chatId)
+                                        .userId(notification.getUserIDA())
+                                        .build())
+                        .build());
 
-        log.info("Adding user with id "+ notification.getUserIDB());
+        log.info("Adding user with id " + notification.getUserIDB());
         chatUserRepository.save(
-            ChatUser.builder()
-                    .dateOfJoining(timeOf)
-                    .id(
-                        ChatUserKey.builder()
-                                    .chatid(chatId)
-                                    .userId(notification.getUserIDB())
-                                    .build()
-                    )
-                    .build()
-        );
+                ChatUser.builder()
+                        .dateOfJoining(timeOf)
+                        .id(
+                                ChatUserKey.builder()
+                                        .chatid(chatId)
+                                        .userId(notification.getUserIDB())
+                                        .build())
+                        .build());
+    }
+
+    public void deleteChat(String id) {
+        log.info("Deleting chat with id " + id);
+        chatRepository.deleteById(id);
     }
 }

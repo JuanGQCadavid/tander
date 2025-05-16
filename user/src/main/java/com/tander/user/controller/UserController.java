@@ -1,5 +1,6 @@
 package com.tander.user.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import com.tander.user.service.UserService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,6 +33,11 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @GetMapping("/")
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
     @GetMapping("/{id}")
     public Optional<UserDto> getUserById(@PathVariable Long id) {

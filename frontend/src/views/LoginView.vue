@@ -84,17 +84,16 @@ export default {
             this.apiError = '';
 
             try {
-                const response = await axios.post('http://localhost:8003/api/user/login', this.form);
-
-                console.log('Login successful:', response.data);
-
-                if (response.data) {
-                    const userData = response.data;
-                    sessionStorage.setItem('user', JSON.stringify(userData));
-                    window.dispatchEvent(new CustomEvent('userLoggedIn', { 
-                        detail: userData 
-                    }));
-                    this.$router.push('/');
+                const token = await axios.post('http://localhost:8003/api/user/login', this.form);
+                if (token) {
+                  // const userData = response.data;
+                  // sessionStorage
+                  localStorage.setItem('token', token)
+                  // sessionStorage.setItem('user', JSON.stringify(userData));
+                  /* window.dispatchEvent(new CustomEvent('userLoggedIn', {
+                    detail: userData
+                  })); */
+                  this.$router.push('/');
                 }
             } catch (error) {
                 console.error('Login error:', error);

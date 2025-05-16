@@ -96,7 +96,6 @@ public class JwtService {
                 .getBody();
     }
 
-    // A function to extract the subject of the token (user name)
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

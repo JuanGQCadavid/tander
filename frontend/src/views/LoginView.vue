@@ -32,6 +32,7 @@
 
 <script>
 import axios from 'axios';
+import {jwtDecode} from "jwt-decode";
 
 export default {
     name: 'LoginView',
@@ -84,17 +85,24 @@ export default {
             this.apiError = '';
 
             try {
-                const response = await axios.post('http://localhost:8003/api/user/login', this.form);
+              const response = await axios.post('http://localhost:8003/api/user/login',
+                  this.form,
+                  {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                  }
+              );
 
-                console.log('Login successful:', response.data);
-
-                if (response.data) {
-                    const userData = response.data;
-                    sessionStorage.setItem('user', JSON.stringify(userData));
-                    window.dispatchEvent(new CustomEvent('userLoggedIn', { 
-                        detail: userData 
-                    }));
-                    this.$router.push('/');
+              if (response.data) {
+                localStorage.setItem('token', response.data)
+                const decoded = jwtDecode(response.data);
+                localStorage.setItem('userId', decoded.userId);
+                window.dispatchEvent(new CustomEvent('userLoggedIn', {
+                    detail: decoded.userId
+                }));
+                this.$router.push('/');
                 }
             } catch (error) {
                 console.error('Login error:', error);

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.tander.commons.model.Notification;
@@ -32,6 +33,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final KafkaTemplate<String, Notification> kafki;
 
@@ -63,8 +67,9 @@ public class UserService {
 
         User user = User.builder()
                 .email(registrationDtoDto.getEmail())
-                .password(registrationDtoDto.getPassword()) // TODO: hash
+                .password(passwordEncoder.encode(registrationDtoDto.getPassword()))
                 .phoneNumber(registrationDtoDto.getPhoneNumber())
+                .role("USER")
                 .isVerified(false)
                 .build();
 

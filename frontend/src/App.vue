@@ -55,25 +55,24 @@ export default {
     },
     methods: {
         handleUserLogin(event) {
-            const userData = event.detail;
-            this.userId = userData.id;
+            this.userId = event.detail;
             this.isLoggedIn = true;
             this.connectWebSocket();
         },
         logout() {
-            localStorage.removeItem('user');
-            sessionStorage.removeItem('user');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('token')
             this.isLoggedIn = false;
             this.userId = null;
             this.$router.push('/');
         },
         getUserIdFromAuth() {
-            const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-            return user.id || null;
+          return localStorage.getItem('userId') || null
         },
         checkIfLoggedIn() {
-            const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-            return !!user.id;
+          const userId = localStorage.getItem('userId');
+          const token = localStorage.getItem('token');
+          return !!userId && !!token;
         },
         checkAuthStatus() {
             this.userId = this.getUserIdFromAuth();

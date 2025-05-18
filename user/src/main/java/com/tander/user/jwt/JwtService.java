@@ -1,5 +1,6 @@
 package com.tander.user.jwt;
 
+import com.tander.user.configuration.MyUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.tander.user.configuration.MyUserDetailsService;
-
 
 import java.security.Key;
 import java.util.Collection;
@@ -36,6 +36,11 @@ public class JwtService {
     // After that, we are passing the claims (HashMap()) and the user name to another function to create the jwt token.
     public String generateToken(String userName){
         Map<String,Object> claims = new HashMap<>();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+        // Add user ID to claims
+        if (userDetails instanceof MyUserDetails) {
+            claims.put("userId", ((MyUserDetails) userDetails).getUserId());
+        }
         return createToken(claims, userName);
     }
 
@@ -104,6 +109,11 @@ public class JwtService {
     public String extractRoles(String token) {
         String claimRoles = extractAllClaims(token).get("roles", String.class);
         return  claimRoles;
+    }
+
+    // A function to extract the user ID from the token
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("userId", Long.class);
     }
 
     // A function to extract the token expiration date

@@ -53,8 +53,7 @@ export default {
     },
     methods: {
         getUserIdFromAuth() {
-            const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-            return user.id;
+          return localStorage.getItem('userId');
         },
         fetchProfiles() {
             axios.get(searchUrl + `?userId=${this.getUserIdFromAuth()}`)

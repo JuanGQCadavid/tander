@@ -8,7 +8,7 @@
                 <router-link to="/search">Search</router-link>
             </div>
             <div class="nav-items">
-                <NotificationsPanel :userId="userId" v-if="isLoggedIn" />
+                <NotificationsPanel :token="token" v-if="isLoggedIn" />
             </div>
             <div class="nav-right">
                 <router-link v-if="!isLoggedIn" to="/login">Login</router-link>
@@ -34,6 +34,7 @@ export default {
             socket: null,
             notificationWS: "ws://localhost:8001/ws",
             userId: null,
+            token: null,
             isLoggedIn: false
         };
     },
@@ -76,6 +77,7 @@ export default {
         },
         checkAuthStatus() {
             this.userId = this.getUserIdFromAuth();
+            this.token = localStorage.getItem('token') || null
             this.isLoggedIn = this.checkIfLoggedIn();
         },
         connectWebSocket() {
@@ -88,7 +90,7 @@ export default {
                     {
                         cmd: "AttachUserId",
                         payload: {
-                            userId: this.userId,
+                            userId: `Bearer ${this.token}`,
                         }
                     }
                 ));

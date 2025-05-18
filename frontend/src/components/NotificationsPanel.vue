@@ -24,7 +24,7 @@
 export default {
   name: 'NotificationsPanel',
   props: {
-    userId: String
+    token: String
   },
   components: {
     
@@ -40,12 +40,12 @@ export default {
         console.log("Click!")
         this.isToggle = !this.isToggle;
     },
-    fetHistory(userId){
+    fetHistory(token){
         fetch(`http://localhost:8004/api/notification/history`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'userId': userId,
+                    'Authorization': `Bearer ${token}`
                 },
             })
             .then(response => response.json())
@@ -59,7 +59,7 @@ export default {
   },
   mounted(){
         console.log('Notifications panel component is created')
-        this.fetHistory(this.userId)
+        this.fetHistory(this.token)
     }
 }
 </script>

@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.tander.chatmanagment.exceptions.MatchException;
@@ -22,6 +21,12 @@ import com.tander.chatmanagment.repository.ChatRepository;
 import com.tander.chatmanagment.repository.ChatUserRepository;
 import com.tander.chatmanagment.repository.MessagesRepository;
 import com.tander.commons.model.payloads.MatchNotification;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,12 +58,12 @@ public class ChatManagmentService {
                 .collect(Collectors.toList());
     }
 
-    public List<ChatUsersDTO> getChatMembers(String userId, String chatId) {
+    public List<ChatUsersDTO> getChatMembers(String userId, String chatId, String authorization) {
         log.info(userId);
         List<ChatUsersDTO> noFiltered = chatUserRepository.findMembersByChatId(chatId)
                 .stream()
                 .map(chatUser -> ChatUsersDTO.fromChatUser(chatUser))
-                .map(dto -> addUserAttributes(dto))
+                .map(dto -> addUserAttributes(dto, authorization))
                 .collect(Collectors.toList());
 
         List<ChatUsersDTO> filtered = noFiltered
@@ -73,12 +78,24 @@ public class ChatManagmentService {
         return filtered;
     }
 
-    public ChatUsersDTO addUserAttributes(ChatUsersDTO dto) {
+    public ChatUsersDTO addUserAttributes(ChatUsersDTO dto, String authorization) {
+
         String url = "http://localhost:8003/api/user/" + dto.getUserId();
-        ChatUsersDTO response = restTemplate.getForObject(url, ChatUsersDTO.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authorization);
+        HttpEntity<String> entity = new HttpEntity(headers);
+        
+        ResponseEntity<ChatUsersDTO> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            entity,
+            ChatUsersDTO.class
+        );
+
+
         log.info(url);
         log.info(response.toString());
-        dto.setEmail(response.getEmail());
+        dto.setEmail(response.getBody().getEmail());
         return dto;
     }
 

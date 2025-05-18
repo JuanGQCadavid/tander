@@ -62,7 +62,7 @@ public class RESTController {
     @GetMapping("/members/{chatId}")
     public List<ChatUsersDTO> getChatMembers(@RequestHeader String Authorization, @PathVariable String chatId) {
         String userId = securityUtil.getUserIdLOrThrowError(Authorization);
-        return service.getChatMembers(userId, chatId);
+        return service.getChatMembers(userId, chatId, Authorization);
     }
 
     @DeleteMapping("/{id}")

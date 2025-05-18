@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         // ALLOWED FOR EVERYONE
-                        .requestMatchers("/api/user/register", "/api/user/login").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/{id}").permitAll()
                         // ALLOWED FOR ADMIN ROLE
                         // .requestMatchers("/api/auth/admin").hasAuthority("ADMIN")
                         // ALLOWED FOR USER ROLE

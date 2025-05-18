@@ -16,7 +16,7 @@ public class MatchesController {
     @Autowired
     private MatchesService matchesService;
 
-    @GetMapping
+    @GetMapping("/")
     public List<MatchDTO> getAllMatches() {
         return matchesService.getAllMatches();
     }

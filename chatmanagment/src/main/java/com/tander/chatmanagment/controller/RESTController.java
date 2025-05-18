@@ -8,6 +8,7 @@ import com.tander.chatmanagment.dto.ChatDTO;
 import com.tander.chatmanagment.dto.ChatUsersDTO;
 import com.tander.chatmanagment.dto.MessagesDTO;
 import com.tander.chatmanagment.exceptions.MatchException;
+import com.tander.chatmanagment.security.SecurityUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,13 +28,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/chat")
 @AllArgsConstructor
 public class RESTController {
+
+    private final SecurityUtil securityUtil;
     private final ChatManagmentService service;
 
     @GetMapping("/history/{chatId}")
     public List<MessagesDTO> getMethodName(
             @RequestParam(required = false) String fromId,
             @PathVariable String chatId,
-            @RequestHeader String userId) {
+            @RequestHeader String Authorization) {
+
+        String userId = securityUtil.getUserIdLOrThrowError(Authorization);
 
         if (!service.isUserOnChat(userId, chatId)) {
             log.warn("UserId " + userId + " try to access chat id  " + chatId + " but he is not part of the gang");
@@ -49,12 +54,14 @@ public class RESTController {
     }
 
     @GetMapping("/")
-    public List<ChatDTO> getChats(@RequestHeader String userId) {
+    public List<ChatDTO> getChats(@RequestHeader String Authorization) {
+        String userId = securityUtil.getUserIdLOrThrowError(Authorization);
         return service.getChats(userId);
     }
 
     @GetMapping("/members/{chatId}")
-    public List<ChatUsersDTO> getChatMembers(@RequestHeader String userId, @PathVariable String chatId) {
+    public List<ChatUsersDTO> getChatMembers(@RequestHeader String Authorization, @PathVariable String chatId) {
+        String userId = securityUtil.getUserIdLOrThrowError(Authorization);
         return service.getChatMembers(userId, chatId);
     }
 

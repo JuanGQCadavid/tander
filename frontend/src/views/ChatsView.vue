@@ -22,12 +22,12 @@ export default {
     }
   },
   methods: {
-    fetchMembers(chatId, userId){
+    fetchMembers(chatId, token){
         fetch(`http://localhost:8009/api/chat/members/${chatId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'userId': userId,
+                    'Authorization': `Bearer ${token}`,
                 },
             })
             .then(response => response.json())
@@ -51,12 +51,12 @@ export default {
                 console.error('Error fetching chats:', error);
             });
     },
-    fetchChats(userId) {
+    fetchChats(token) {
         fetch(`http://localhost:8009/api/chat/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'userId': userId,
+                    'Authorization': `Bearer ${token}`,
                 },
             })
             .then(response => response.json())
@@ -70,7 +70,7 @@ export default {
                         users: [],
                     });
 
-                    this.fetchMembers(chat.id, userId)
+                    this.fetchMembers(chat.id, token)
                 })
 
             })
@@ -80,24 +80,20 @@ export default {
     }
   },
   mounted(){
+        const token = localStorage.getItem('token');
+        // const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
 
-        const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-
-        if(user.id == null) {
+        if(token == null || token == "") {
             this.$router.push({
               name: "Login", 
             });
         }
 
         console.log('ChatView component is created')
-        console.log("user ID - " + user.id)
-        this.fetchChats(user.id)
-        this.userId = user.id
+        console.log("Token - " + token)
+        this.fetchChats(token)
+        this.userId = localStorage.getItem('userId');
         return
-
-
-
-
     }
 }
 </script>

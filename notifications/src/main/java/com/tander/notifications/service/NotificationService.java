@@ -77,7 +77,7 @@ public class NotificationService {
     }
 
     public String getUserPhoneCall(String userId){
-        String url = "http://localhost:8003/api/user/"+userId;
+        String url = "http://localhost:8003/api/user/"+userId; // TODO - What token should I use?
         UserDTO response = restTemplate.getForObject(url, UserDTO.class);
         return response != null ? response.getPhoneNumber() : null;
     }

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tander.notifications.managers.SocketConnectionManager;
 import com.tander.notifications.model.WebsocketCommands;
 import com.tander.notifications.model.commands.AttachUserId;
+import com.tander.notifications.security.SecurityUtil;
 
 // import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketHandler extends TextWebSocketHandler {
     final SocketConnectionManager socketConnectionManager;
     final Map<WebsocketCommands, BiConsumer<WebSocketSession,TextMessage>> actions;
+    private final SecurityUtil securityUtil;
 
-    WebSocketHandler(SocketConnectionManager socketConnectionManager){
+    WebSocketHandler(SocketConnectionManager socketConnectionManager, SecurityUtil securityUtil){
         this.socketConnectionManager = socketConnectionManager;
+        this.securityUtil = securityUtil;
         this.actions = new HashMap<>() {};
 
         actions.put(WebsocketCommands.ATTACH_USER_ID, this::cmdUserAttach);
@@ -57,6 +61,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 root.get("payload"), 
                 commands.getCommandClass()
             );
+
         } catch (Exception e) {
             log.error("castpayload - Casting payload fail", e);
         }
@@ -76,9 +81,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
             log.info("attachUserIds is empy!");
             return;
         }
-
-        log.info("attachUserIds: " + attachUserId.get().getUserId());
-        socketConnectionManager.attachSessionToUserId(session.getId(), attachUserId.get().getUserId());
+        AttachUserId attachUserId2 = attachUserId.get();
+        attachUserId2.setUserId(securityUtil.getUserIdLOrThrowError(attachUserId2.getUserId()));
+        log.info("attachUserIds: " + attachUserId2.getUserId());
+        socketConnectionManager.attachSessionToUserId(session.getId(), attachUserId2.getUserId());
 
         try {
             session.sendMessage(new TextMessage("OK"));

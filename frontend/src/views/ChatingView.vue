@@ -45,6 +45,7 @@ export default {
             newMessage: '',
             userId: '',
             chatTitle: "",
+            token: "",
         }
     },
     props: {
@@ -66,12 +67,12 @@ export default {
             ]
             return possibles[this.getRandomInt(0, 4)]
         },
-        fetchMembers(chatId, userId){
+        fetchMembers(chatId, userId, token){
             fetch(`http://localhost:8009/api/chat/members/${chatId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'userId': userId,
+                        'Authorization': `Bearer ${token}`
                     },
                 })
                 .then(response => response.json())
@@ -89,12 +90,12 @@ export default {
                     console.error('Error fetching chats:', error);
                 });
         },
-        fetHistory(userId, chatId) {
+        fetHistory(token, chatId) {
             fetch(`http://localhost:8009/api/chat/history/${chatId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'userId': userId,
+                    'Authorization': `Bearer ${token}`
                 },
             })
             .then(response => response.json())
@@ -156,7 +157,7 @@ export default {
                 {
                     cmd: "AttachUserId",
                     payload: {
-                        userId: this.userId,
+                        userId: `Bearer ${this.token}`,
                         chatId: this.chatId
                     }
                 }
@@ -165,21 +166,28 @@ export default {
     },
     mounted(){
         console.log('ChatView component is created')
-        const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
 
-        if(user.id == null) {
+        this.userId = localStorage.getItem('userId');
+        if(this.userId == null) {
             this.$router.push({
               name: "Login", 
             });
         }
 
-        console.log("user ID - " + user.id)
-        this.userId = user.id
+        const token = localStorage.getItem('token');
 
+        if(token == null || token == "") {
+            this.$router.push({
+              name: "Login", 
+            });
+        }
+
+        console.log("user ID - " + this.userId)
+        this.token = token 
 
         this.createWebSocket()
-        this.fetHistory(this.userId, this.chatId)
-        this.fetchMembers(this.chatId, this.userId)
+        this.fetHistory(this.token, this.chatId)
+        this.fetchMembers(this.chatId, this.userId, this.token)
     }
 
 }

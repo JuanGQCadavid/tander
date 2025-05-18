@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tander.chat.model.WebsocketCommands;
 import com.tander.chat.model.cmd.AttachUserId;
 import com.tander.chat.model.cmd.Message;
+import com.tander.chat.security.SecurityUtil;
 import com.tander.chat.service.ChatService;
 
 
@@ -25,10 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebSocketHandler extends TextWebSocketHandler {
     final ChatService chatService;
+    private final SecurityUtil securityUtil;
     final Map<WebsocketCommands, BiConsumer<WebSocketSession,TextMessage>> actions;
 
-    public WebSocketHandler(ChatService chatService){
+    public WebSocketHandler(ChatService chatService,SecurityUtil securityUtil){
         this.chatService = chatService;
+        this.securityUtil = securityUtil;
         this.actions = new HashMap<WebsocketCommands, BiConsumer<WebSocketSession,TextMessage>>();
 
         this.actions.put(WebsocketCommands.ATTACH_USER_ID, this::cmdUserAttach);
@@ -61,14 +64,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private void cmdUserAttach(WebSocketSession session,  TextMessage message) {
         Optional<AttachUserId> payload = castpayload(message, WebsocketCommands.ATTACH_USER_ID);
-
+        
         if(!payload.isPresent()){
             log.info("AttachUserId is empy!");
             this.sendMessageBack(session, "payload needs to have userId and chatId");
             return;
         }
 
-        chatService.attachUsertoChat(payload.get(), session);        
+
+        AttachUserId attachUserId2 = payload.get();
+        log.info(attachUserId2.getUserId());
+        attachUserId2.setUserId(securityUtil.getUserIdLOrThrowError(attachUserId2.getUserId()));
+        log.info("attachUserIds: " + attachUserId2.getUserId());
+
+        chatService.attachUsertoChat(attachUserId2, session);        
     }
 
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.tander.notipersistance.model.NotificationDB;
+import com.tander.notipersistance.security.SecurityUtil;
 import com.tander.notipersistance.service.NotificationService;
 
 import lombok.AllArgsConstructor;
@@ -33,14 +34,19 @@ public class RESTController {
     @Autowired
     private NotificationService service;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     @GetMapping("/history")
-    public List<NotificationDB> getMethodName(@RequestHeader String userID) {
-        return service.getNotifications(userID);
+    public List<NotificationDB> getMethodName(@RequestHeader String Authorization) {
+        String userId = securityUtil.getUserIdLOrThrowError(Authorization);
+        return service.getNotifications(userId);
     }
 
     @PostMapping("/mark/{notificationID}")
-    public void postMethodName(@PathVariable String notificationID, @RequestHeader String userID) {
-        service.markNotification(notificationID, userID);
+    public void postMethodName(@PathVariable String notificationID, @RequestHeader String Authorization) {
+        String userId = securityUtil.getUserIdLOrThrowError(Authorization);
+        service.markNotification(notificationID, userId);
     }
     
     

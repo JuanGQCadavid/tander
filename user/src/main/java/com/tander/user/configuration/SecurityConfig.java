@@ -50,22 +50,22 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         // ALLOWED FOR EVERYONE
-                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/{id}").permitAll()
+                        .requestMatchers("/api/user/register", "/api/user/login", "/api/user/{id}")
+                        .permitAll()
                         // ALLOWED FOR ADMIN ROLE
-                        // .requestMatchers("/api/auth/admin").hasAuthority("ADMIN")
+                        .requestMatchers("/api/user/").hasAuthority("ADMIN")
                         // ALLOWED FOR USER ROLE
                         // .requestMatchers("/api/auth/user").hasAuthority("USER")
                         // ANY OTHER REQUEST REQUIRES AUTH TOKEN
                         .anyRequest().authenticated())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -81,17 +81,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8081")); // Add your frontend URL
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8081")); // Add your
+                                                                                                          // frontend
+                                                                                                          // URL
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization",
-            "Cache-Control",
-            "Content-Type",
-            "Accept",
-            "Origin",
-            "X-Requested-With"
-        ));
+                "Authorization",
+                "Cache-Control",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

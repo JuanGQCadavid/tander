@@ -286,6 +286,7 @@
 
 <script>
 import axios from 'axios';
+import {jwtDecode} from "jwt-decode";
 
 export default {
     name: 'AdminView',
@@ -303,10 +304,14 @@ export default {
         };
     },
     beforeRouteEnter(_to, _from, next) {
-        //TODO: if verified as admin
-        next();
-        //TODO: else
-        //   next({ name: 'home' });
+        const token = localStorage.getItem("token");
+        const decoded = jwtDecode(token);
+        if (decoded.roles == "ADMIN") {
+            next();
+        }
+        else {
+            next({ name: 'home' });
+        }
     },
     created() {
         this.fetchAllData();
@@ -336,7 +341,15 @@ export default {
         },
         async fetchData(serviceName, port) {
             try {
-                const response = await axios.get(`http://localhost:${port}/api/${serviceName}/`);
+                const response = await axios.get(`http://localhost:${port}/api/${serviceName}/`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            "Authorization": "Bearer " + localStorage.getItem("token")
+                        }
+                    }
+                );
                 return response.data || [];
             } catch (error) {
                 console.error(`Error fetching ${serviceName} data:`, error);
@@ -351,7 +364,10 @@ export default {
             try {
                 const response = await axios.get(`http://localhost:8009/api/chat/`, {
                     headers: {
-                        userId: userId
+                        userId: userId,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        "Authorization": "Bearer " + localStorage.getItem("token")
                     }
                 });
                 this.chatData = response.data || [];
